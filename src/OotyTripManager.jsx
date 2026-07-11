@@ -22,7 +22,7 @@ const KEYS = {
 };
 
 // Bump this when the seeded trip-guide content changes so cached plans refresh.
-const PLAN_SCHEMA = "2026-07-ooty-guide-v2";
+const PLAN_SCHEMA = "2026-07-ooty-guide-v3";
 
 const TRAIN_LEGS = [
   { key: "hydMysore", label: "Hyderabad \u2192 Mysore" },
@@ -120,14 +120,15 @@ function seedPlanData() {
     days: [
       {
         id: uid("day"),
-        title: "Day 1 \u2014 Mysore, Chamundi Hills & drive up to Ooty",
+        title: "Day 1 \u2014 Mysore regroup, Theppakadu & drive up to Ooty",
         date: "2026-07-17",
-        subtitle: "Regroup at Mysore \u00b7 temple \u00b7 4\u20134.5 hr scenic drive via Gudalur",
+        subtitle: "Regroup at Mysore \u00b7 elephant camp stop en route \u00b7 4\u20134.5 hr scenic drive via Gudalur",
         activities: [
           act("10:00 AM", "Regroup at Mysore railway station", "Everyone from the Hyderabad & Bangalore trains meets here. Load the tempo traveller and head out."),
-          act("10:15\u201312:30", "Chamundeshwari Temple, Chamundi Hills", "13 km / ~30 min up a winding road. Darshan 7:30 AM\u20132 PM. \u26a0 July 17 is an Ashada Friday \u2014 huge crowds (often in lakhs). Consider VIP darshan (\u20b930\u2013100) at chamundeshwaritemple.in to save time. See the Nandi monolith, Mahishasura statue & city view."),
-          act("12:30 PM", "Quick lunch in Mysore", "Eat near the palace / ring road, or grab packed food. Aim to be rolling by 1:00\u20131:30 PM."),
-          act("1:30\u20136:00", "Drive Mysore \u2192 Ooty via Gudalur (~155\u2013160 km)", "Route: Nanjangud \u2192 Gundlupet \u2192 Bandipur NP \u2192 Theppakadu \u2192 Gudalur \u2192 Pykara \u2192 Ooty. \u26a0 MUST cross the Bandipur/Mudumalai forest before 9 PM (night traffic banned 9 PM\u20136 AM). Do NOT take the Kalhatty 36-hairpin road \u2014 it's court-closed to tourist vehicles in 2026 and too tight for a tempo traveller. Watch for elephants & gaur; don't stop inside the reserve."),
+          act("11:00 AM", "Quick lunch in Mysore", "The Chamundeshwari Temple visit has moved to Day 4, so there's no rush this morning. Eat near the palace / ring road, or grab packed food. Aim to be rolling by noon."),
+          act("12:00\u20133:30 PM", "Drive Mysore \u2192 Theppakadu (~100 km)", "Route: Nanjangud \u2192 Gundlupet \u2192 Bandipur NP \u2192 Theppakadu. Watch for elephants & gaur; don't stop inside the reserve except at the designated Theppakadu stop below."),
+          act("3:30\u20134:00 PM", "Theppakadu Elephant Camp (brief stop)", "Right on the drive route, inside Mudumalai Tiger Reserve \u2014 see the rescued/working elephant camp and kumki elephants. A well-loved, easy stop for the whole group; keep it brief to stay ahead of the 9 PM forest-crossing deadline."),
+          act("4:00\u20136:00 PM", "Continue Theppakadu \u2192 Gudalur \u2192 Pykara \u2192 Ooty (~55\u201360 km)", "\u26a0 MUST cross the Bandipur/Mudumalai forest before 9 PM (night traffic banned 9 PM\u20136 AM) \u2014 comfortably on schedule from here. Do NOT take the Kalhatty 36-hairpin road \u2014 it's court-closed to tourist vehicles in 2026 and too tight for a tempo traveller."),
           act("6:00 PM", "Check in at the Ooty resort", "Premium Room Deluxe, breakfast included. Rest & warm dinner. Ooty town has commercial-vehicle limits 8 AM\u20139 PM \u2014 driver will handle parking."),
         ],
       },
@@ -159,14 +160,16 @@ function seedPlanData() {
       },
       {
         id: uid("day"),
-        title: "Day 4 \u2014 Ooty \u2192 Mysore by 2 PM",
+        title: "Day 4 \u2014 Ooty \u2192 Mysore, Pykara Falls & Chamundeshwari Temple, then the train",
         date: "2026-07-20",
-        subtitle: "The tight day. No morning sightseeing \u2014 there isn't time.",
+        subtitle: "The earliest start of the trip \u2014 Pykara Falls and the temple are now on the way to the train, so there's no slack left.",
         activities: [
-          act("7:30 AM", "Breakfast; settle bills (do this the night before)", "Check out early. Have everyone packed and ready."),
-          act("8:30 AM", "DEPART Ooty (absolute latest 9:00 AM)", "\u26a0 Hard rule. The drive alone is 4\u20134.5 hrs, and monsoon fog / slow convoys / wet roads can add 30\u201360 min. Leaving at 8:30 gives a ~1-hr buffer before 2 PM."),
-          act("8:30\u20131:00", "Drive Ooty \u2192 Mysore via Gudalur", "Cross the forest mid-morning, well within the 6 AM\u20139 PM window. Only realistic stop: a very brief Pykara photo halt, and only if you left by 8 AM."),
-          act("1:00\u20131:30 PM", "Arrive Mysore railway station", "Buffer time before the ~2:00 PM return trains."),
+          act("5:30 AM", "Early breakfast; settle bills (do this the night before)", "Check out early. Have everyone packed and in the tempo traveller by 5:50 AM \u2014 today has no spare time."),
+          act("6:00 AM", "DEPART Ooty (hard deadline)", "\u26a0 Right when the Bandipur/Mudumalai night traffic ban lifts. With Pykara Falls and the temple added today, this departure time is no longer flexible."),
+          act("6:15\u20136:45 AM", "Pykara Falls & Lake (quick stop)", "~10 km out of Ooty on the Gudalur road. Keep it to a short photo stop rather than the full boating experience, to protect the rest of the day."),
+          act("6:45\u201310:30 AM", "Drive Gudalur \u2192 Mysore via Bandipur NP & Theppakadu (~140 km)", "Cross the forest mid-morning, comfortably within the 6 AM\u20139 PM window. No stops inside the reserve."),
+          act("10:30 AM\u201312:30 PM", "Chamundeshwari Temple, Chamundi Hills", "13 km / ~30 min up from Mysore. Strongly recommend booking VIP darshan (\u20b930\u2013100 at chamundeshwaritemple.in) in advance \u2014 there's no time for a long queue today. See the Nandi monolith, Mahishasura statue & city view on the way down."),
+          act("12:30\u20131:15 PM", "Drive down & arrive Mysore railway station", "Buffer before the return trains. If you're running behind, shorten the temple stop \u2014 not the train."),
         ],
       },
     ],
