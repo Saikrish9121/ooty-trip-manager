@@ -25,7 +25,7 @@ const KEYS = {
 };
 
 // Bump this when the seeded trip-guide content changes so cached plans refresh.
-const PLAN_SCHEMA = "2026-07-ooty-guide-v4";
+const PLAN_SCHEMA = "2026-07-ooty-guide-v5";
 
 const TRAIN_LEGS = [
   { key: "hydMysore", label: "Hyderabad \u2192 Mysore" },
@@ -251,25 +251,46 @@ function seedPlanData() {
       ],
     },
     food: [
-      { id: uid("fd"), name: "Nilgiri tea", note: "The signature product. Roadside chai is strong CTC; for a real experience seek single-estate orthodox tea from Coonoor estates \u2014 lighter and aromatic." },
-      { id: uid("fd"), name: "Ooty Varkey", note: "GI-tagged flaky biscuit (maida/rice flour, ghee, fermented starter, wood-fired). Best dipped in hot chai. West Coast Bakery; Crown Bakery in Coonoor." },
-      { id: uid("fd"), name: "Homemade chocolates", note: "A genuine local craft \u2014 milk, dark, nut, fruit, even chilli. King Star & shops around Charring Cross / Commercial Road." },
-      { id: uid("fd"), name: "Badaga cuisine", note: "Food of the indigenous Badaga community \u2014 millet-based dishes, kattu saadham, keerai masiyal, Badaga chicken curry & thali. Jackfruit curry is a regional specialty." },
-      { id: uid("fd"), name: "Chilli bajji (mulaga bajji)", note: "The essential street-food bite from the stalls at Ooty Lake." },
-      { id: uid("fd"), name: "Ooty carrots & hill vegetables", note: "The Nilgiris supplies much of South India's cold-weather produce \u2014 fresh, sweet carrots are a local point of pride." },
-      { id: uid("fd"), name: "Toda buffalo dairy", note: "Some Toda communities sell rich buffalo butter/dairy \u2014 ask at craft outlets near the Botanical Garden (not always available)." },
+      // Mysore
+      { id: uid("fd"), zone: "Mysore", name: "Mysore Pak", note: "The city's most iconic sweet \u2014 dense, ghee-soaked gram flour fudge. Best at Guru Sweet Mart (K.R. Circle) or Sri Krishna Sweets. Buy a box before you leave.", bestAt: "Guru Sweet Mart, K.R. Circle" },
+      { id: uid("fd"), zone: "Mysore", name: "Set Dosa (Mysore style)", note: "Thinner and slightly tangy, served with chutney + sambar. Classic breakfast before hitting the road.", bestAt: "Hotel Mylari (Nazarbad) or any old-city darshini" },
+      { id: uid("fd"), zone: "Mysore", name: "Mysore Masala Dosa", note: "Red-chutney-smeared dosa, much spicier than the Bengaluru version. Must-try at Hotel Mylari.", bestAt: "Hotel Mylari" },
+      // En Route (Gundlupet / Bandipur)
+      { id: uid("fd"), zone: "En Route", name: "Gundlupet Meals", note: "South Indian veg thali from dhaba-style hotels along NH181. Cheap, filling, authentic Kannada cooking \u2014 great lunch stop.", bestAt: "Local dhabas near Gundlupet bus stand" },
+      { id: uid("fd"), zone: "En Route", name: "Sugarcane juice + tender coconut", note: "Roadside stalls between Bandipur and Masinagudi \u2014 best way to cool off before the climb.", bestAt: "Roadside stalls, Masinagudi junction" },
+      // Pykara
+      { id: uid("fd"), zone: "Pykara", name: "Packed snacks at Pykara", note: "No restaurants at the falls/dam. Carry biscuits and bottled water from Ooty. The walk can take 45 min+.", bestAt: "Carry from Ooty" },
+      // Ooty
+      { id: uid("fd"), zone: "Ooty", name: "Nilgiri orthodox tea", note: "For a real experience, seek single-estate orthodox tea from Highfield Tea Estate (Coonoor) or Ooty tea shops \u2014 lighter and aromatic vs. roadside CTC chai.", bestAt: "Highfield Tea Estate shop, Coonoor" },
+      { id: uid("fd"), zone: "Ooty", name: "Ooty Varkey (GI-tagged)", note: "Flaky biscuit made with maida, rice flour, ghee and fermented starter, wood-fired. Best dipped in hot chai.", bestAt: "West Coast Bakery, Ooty" },
+      { id: uid("fd"), zone: "Ooty", name: "Homemade chocolates", note: "A genuine local craft \u2014 milk, dark, nut, fruit, even chilli. Get a sampler box.", bestAt: "King Star Chocolate, Commercial Road" },
+      { id: uid("fd"), zone: "Ooty", name: "Badaga thali", note: "Millet-based dishes, keerai masiyal, Badaga chicken curry, jackfruit curry. Indigenous Nilgiri cooking, rarely found elsewhere.", bestAt: "Local Badaga eateries near Ooty market" },
+      { id: uid("fd"), zone: "Ooty", name: "Chilli bajji (mulaga bajji)", note: "The essential street-food bite at Ooty Lake stalls. One of the cheapest, tastiest bites on the trip.", bestAt: "Street stalls, Ooty Lake" },
+      { id: uid("fd"), zone: "Ooty", name: "Biryani (group dinner)", note: "HBH Jumbo biryani feeds 6\u20137 people. Order 2-3 buckets for the group.", bestAt: "Hyderabad Biryani House (HBH), Ooty" },
+      { id: uid("fd"), zone: "Ooty", name: "Toda buffalo dairy", note: "Rich buffalo butter from Toda community craft outlets near the Botanical Garden. Not always available.", bestAt: "Craft outlets near Botanical Garden" },
+      // Coonoor
+      { id: uid("fd"), zone: "Coonoor", name: "Coonoor Varkey + tea", note: "Crown Bakery in Coonoor is the rival to Ooty's version. Pair with a cup of fresh-brewed Nilgiri tea.", bestAt: "Crown Bakery, Coonoor" },
+      { id: uid("fd"), zone: "Coonoor", name: "Lemon tarts & bakery items", note: "Coonoor has a thriving bakery culture. The Lemon Tart at Sullivan's Bakery is a local favourite.", bestAt: "Sullivan's Bakery, Coonoor" },
     ],
     restaurants: [
-      { id: uid("rs"), name: "Hyderabad Biryani House (HBH)", tier: "Cheap & best", cuisine: "Hyderabadi biryani, Al Faham, kebabs", note: "The group crowd-pleaser. Huge portions (a Jumbo biryani feeds 6\u20137), window views. Go early; on-road parking. Reviewers eat here multiple nights." },
-      { id: uid("rs"), name: "Hotel Junior Kuppanna", tier: "Cheap & best", cuisine: "Kongu-style non-veg, banana-leaf meals", note: "Authentic mutton specialty, locally recommended. Can be crowded; tight parking." },
-      { id: uid("rs"), name: "Hotel Pankaj Bhojanalaya", tier: "Cheap & best", cuisine: "Pure-veg North Indian", note: "Soft home-style rotis, very affordable. Locals rate it over the touristy chains." },
-      { id: uid("rs"), name: "Willy's Coffee Pub", tier: "Cheap & best", cuisine: "Cafe \u2014 burgers, pizza, lemon tea", note: "Budget hangout loved by students/backpackers; has a book collection." },
-      { id: uid("rs"), name: "Shinkow's Chinese Restaurant", tier: "Mid-range", cuisine: "Authentic Chinese", note: "Ooty institution since 1954 \u2014 chilli pork, American chop suey. ~\u20b9800 for two. Go early." },
-      { id: uid("rs"), name: "Place to Bee", tier: "Mid-range", cuisine: "Cafe \u2014 wood-fired pizza, desserts", note: "Vintage charm, banoffee pie & tiramisu, organic/vegan-friendly. Great ambience." },
-      { id: uid("rs"), name: "Nahar's Sidewalk Cafe", tier: "Mid-range", cuisine: "Veg multi-cuisine", note: "Wood-fired pizza, pastas, garden seating at Charring Cross." },
-      { id: uid("rs"), name: "Cliff Top Restaurant", tier: "Mid-range", cuisine: "Multi-cuisine + valley views", note: "North/South Indian, Chinese, seafood; well-reviewed for food + scenery." },
-      { id: uid("rs"), name: "Earl's Secret @ Kings Cliff", tier: "Luxury", cuisine: "Fine dining, continental", note: "Ooty's standout \u2014 glass-enclosed colonial bungalow, valley views, famous white-chocolate brownie. Book ahead for 14." },
-      { id: uid("rs"), name: "Curry & Rice, Fernhill Royale Palace", tier: "Luxury", cuisine: "Anglo-Indian / royal", note: "Wodeyar-legacy cuisine in an opulent heritage palace. ~\u20b91,000+ for two." },
+      // Mysore
+      { id: uid("rs"), zone: "Mysore", name: "Hotel Mylari", tier: "Cheap & best", cuisine: "Masala dosa, set dosa", note: "Legendary 70-year-old institution. Go before 9 AM to avoid a queue. Cash only.", openHours: "7 AM \u2013 11 AM, 4 PM \u2013 8 PM", mapsUrl: "https://www.google.com/maps/search/?api=1&query=Hotel+Mylari+Mysore" },
+      { id: uid("rs"), zone: "Mysore", name: "Guru Sweet Mart", tier: "Cheap & best", cuisine: "Mysore Pak, sweets, savories", note: "The definitive Mysore Pak stop. Small shop at K.R. Circle, always busy.", openHours: "8 AM \u2013 9 PM", mapsUrl: "https://www.google.com/maps/search/?api=1&query=Guru+Sweet+Mart+Mysore" },
+      // En Route (Gundlupet)
+      { id: uid("rs"), zone: "En Route", name: "Hotel Green Park (Gundlupet)", tier: "Cheap & best", cuisine: "South Indian veg + non-veg meals", note: "Most recommended lunch stopover on the Mysore\u2013Ooty highway. Clean, quick service, good rice meals.", openHours: "7 AM \u2013 10 PM", mapsUrl: "https://www.google.com/maps/search/?api=1&query=Hotel+Green+Park+Gundlupet" },
+      // Ooty
+      { id: uid("rs"), zone: "Ooty", name: "Hyderabad Biryani House (HBH)", tier: "Cheap & best", cuisine: "Hyderabadi biryani, Al Faham, kebabs", note: "The group crowd-pleaser. Jumbo biryani bucket feeds 6\u20137. Go early, on-road parking.", openHours: "12 PM \u2013 10:30 PM", mapsUrl: "https://www.google.com/maps/search/?api=1&query=Hyderabad+Biryani+House+Ooty" },
+      { id: uid("rs"), zone: "Ooty", name: "Hotel Junior Kuppanna", tier: "Cheap & best", cuisine: "Kongu-style non-veg, banana-leaf meals", note: "Authentic mutton specialty, locally recommended.", openHours: "12 PM \u2013 3:30 PM, 7 PM \u2013 10 PM", mapsUrl: "https://www.google.com/maps/search/?api=1&query=Hotel+Junior+Kuppanna+Ooty" },
+      { id: uid("rs"), zone: "Ooty", name: "Hotel Pankaj Bhojanalaya", tier: "Cheap & best", cuisine: "Pure-veg North Indian", note: "Soft home-style rotis, very affordable. Locals rate it over the touristy chains.", openHours: "7 AM \u2013 10 PM", mapsUrl: "https://www.google.com/maps/search/?api=1&query=Hotel+Pankaj+Bhojanalaya+Ooty" },
+      { id: uid("rs"), zone: "Ooty", name: "Willy's Coffee Pub", tier: "Cheap & best", cuisine: "Burgers, pizza, lemon tea, waffles", note: "Budget hangout loved by students and backpackers; has a book collection and cozy corners.", openHours: "9 AM \u2013 9 PM", mapsUrl: "https://www.google.com/maps/search/?api=1&query=Willys+Coffee+Pub+Ooty" },
+      { id: uid("rs"), zone: "Ooty", name: "Shinkow's Chinese Restaurant", tier: "Mid-range", cuisine: "Authentic Chinese", note: "Ooty institution since 1954 \u2014 chilli pork, American chop suey. ~\u20b9800 for two. Go early.", openHours: "12 PM \u2013 3 PM, 7 PM \u2013 10 PM", mapsUrl: "https://www.google.com/maps/search/?api=1&query=Shinkows+Chinese+Restaurant+Ooty" },
+      { id: uid("rs"), zone: "Ooty", name: "Place to Bee", tier: "Mid-range", cuisine: "Cafe \u2014 wood-fired pizza, banoffee pie, tiramisu", note: "Vintage charm, organic/vegan-friendly. Great ambience for a relaxed lunch.", openHours: "9 AM \u2013 9 PM", mapsUrl: "https://www.google.com/maps/search/?api=1&query=Place+to+Bee+Ooty" },
+      { id: uid("rs"), zone: "Ooty", name: "Nahar's Sidewalk Cafe", tier: "Mid-range", cuisine: "Veg multi-cuisine, wood-fired pizza, pastas", note: "Garden seating at Charring Cross. Good salads and continental options.", openHours: "10 AM \u2013 10 PM", mapsUrl: "https://www.google.com/maps/search/?api=1&query=Nahars+Sidewalk+Cafe+Ooty" },
+      { id: uid("rs"), zone: "Ooty", name: "Earl's Secret @ Kings Cliff", tier: "Luxury", cuisine: "Fine dining, continental", note: "Ooty's standout \u2014 glass-enclosed colonial bungalow, valley views, famous white-chocolate brownie. Book ahead for 14.", openHours: "12:30 PM \u2013 3 PM, 7 PM \u2013 10 PM", mapsUrl: "https://www.google.com/maps/search/?api=1&query=Earls+Secret+Kings+Cliff+Ooty" },
+      { id: uid("rs"), zone: "Ooty", name: "Curry & Rice, Fernhill Royale Palace", tier: "Luxury", cuisine: "Anglo-Indian / royal heritage", note: "Wodeyar-legacy cuisine in an opulent heritage palace. ~\u20b91,000+ for two.", openHours: "12 PM \u2013 3 PM, 7:30 PM \u2013 10:30 PM", mapsUrl: "https://www.google.com/maps/search/?api=1&query=Fernhill+Palace+Ooty+restaurant" },
+      // Coonoor
+      { id: uid("rs"), zone: "Coonoor", name: "The Velvet Seasons Restaurant", tier: "Mid-range", cuisine: "South Indian + continental, valley views", note: "Well-reviewed for panoramic views and quality food. Good for Day 3 lunch.", openHours: "8 AM \u2013 10 PM", mapsUrl: "https://www.google.com/maps/search/?api=1&query=Velvet+Seasons+Restaurant+Coonoor" },
+      { id: uid("rs"), zone: "Coonoor", name: "Ravines Cafe", tier: "Cheap & best", cuisine: "Cafe \u2014 sandwiches, omelettes, lemon tea", note: "Popular budget cafe in Coonoor, great for a quick post-Dolphin's Nose bite.", openHours: "8 AM \u2013 7 PM", mapsUrl: "https://www.google.com/maps/search/?api=1&query=Ravines+Cafe+Coonoor" },
     ],
   };
 }
@@ -1291,6 +1312,11 @@ function ItineraryTab({ planData, onUpdatePlan, isAdmin, currentUser, onRequestP
                     <div className="otm-act-head">
                       {a.time && <span className="otm-time"><Clock size={11} /> {a.time}</span>}
                       <span className="otm-act-text">{a.text}</span>
+                      {a.mapsUrl ? (
+                        <a href={a.mapsUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: "var(--accent)", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 3, marginLeft: 6, flexShrink: 0 }}><MapPin size={10} /> Map</a>
+                      ) : (
+                        <a href={"https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(a.text + " Ooty Nilgiris")} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: "var(--accent)", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 3, marginLeft: 6, flexShrink: 0 }}><MapPin size={10} /> Map</a>
+                      )}
                     </div>
                     {a.detail && <div className="otm-act-detail">{a.detail}</div>}
                   </div>
@@ -1425,41 +1451,66 @@ function ItineraryTab({ planData, onUpdatePlan, isAdmin, currentUser, onRequestP
       )}
 
       {tab === "food" && (
-        <div className="otm-panel">
-          <div className="otm-panel-head"><h3 className="otm-panel-title"><UtensilsCrossed size={16} /> Local dishes & specialties to try</h3></div>
-          {food.length ? food.map((f) => (
-            <div className="otm-food-item" key={f.id}>
-              <div className="otm-food-name">{f.name}</div>
-              <div className="otm-food-note">{f.note}</div>
-            </div>
-          )) : <div className="otm-empty">No food notes yet.</div>}
+        <div>
+          {["Mysore", "En Route", "Pykara", "Ooty", "Coonoor"].map((zone) => {
+            const items = food.filter((f) => (f.zone || "Ooty") === zone);
+            if (!items.length) return null;
+            return (
+              <div className="otm-panel" key={zone} style={{ marginBottom: 16 }}>
+                <div className="otm-panel-head"><h3 className="otm-panel-title"><UtensilsCrossed size={16} /> {zone}</h3></div>
+                {items.map((f) => (
+                  <div className="otm-food-item" key={f.id}>
+                    <div className="otm-food-name">{f.name}</div>
+                    <div className="otm-food-note">{f.note}</div>
+                    {f.bestAt && <div style={{ fontSize: 12, color: "var(--accent)", marginTop: 4 }}>{"Best at: " + f.bestAt}</div>}
+                  </div>
+                ))}
+              </div>
+            );
+          })}
+          {!food.length && <div className="otm-panel"><div className="otm-empty">No food notes yet.</div></div>}
         </div>
       )}
 
       {tab === "restaurants" && (
         <div>
-          {tierOrder.map((tier) => {
-            const items = restaurants.filter((r) => r.tier === tier);
-            if (!items.length) return null;
-            const meta = tierMeta[tier] || { cls: "settled", stars: 1 };
+          {["Mysore", "En Route", "Ooty", "Coonoor"].map((zone) => {
+            const zoneItems = restaurants.filter((r) => (r.zone || "Ooty") === zone);
+            if (!zoneItems.length) return null;
             return (
-              <div className="otm-panel" key={tier} style={{ marginBottom: 16 }}>
-                <div className="otm-panel-head">
-                  <h3 className="otm-panel-title">
-                    <span className={"otm-stamp " + meta.cls} style={{ fontSize: 10 }}>
-                      {Array.from({ length: meta.stars }).map((_, i) => <Star key={i} size={10} />)} {tier}
-                    </span>
-                  </h3>
-                </div>
-                {items.map((r) => (
-                  <div className="otm-rest-item" key={r.id}>
-                    <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
-                      <span className="otm-rest-name">{r.name}</span>
-                      <span className="otm-rest-cuisine">{r.cuisine}</span>
+              <div key={zone}>
+                <div style={{ fontWeight: 700, fontSize: 14, color: "var(--ink-soft)", margin: "18px 0 8px 2px", letterSpacing: 0.5 }}>{zone}</div>
+                {tierOrder.map((tier) => {
+                  const items = zoneItems.filter((r) => r.tier === tier);
+                  if (!items.length) return null;
+                  const meta = tierMeta[tier] || { cls: "settled", stars: 1 };
+                  return (
+                    <div className="otm-panel" key={tier} style={{ marginBottom: 12 }}>
+                      <div className="otm-panel-head">
+                        <h3 className="otm-panel-title">
+                          <span className={"otm-stamp " + meta.cls} style={{ fontSize: 10 }}>
+                            {Array.from({ length: meta.stars }).map((_, i) => <Star key={i} size={10} />)} {tier}
+                          </span>
+                        </h3>
+                      </div>
+                      {items.map((r) => (
+                        <div className="otm-rest-item" key={r.id}>
+                          <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "flex-start" }}>
+                            <span className="otm-rest-name">{r.name}</span>
+                            {r.mapsUrl && (
+                              <a href={r.mapsUrl} target="_blank" rel="noopener noreferrer" className="otm-btn otm-btn-ghost otm-btn-sm" style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 4, fontSize: 11 }}>
+                                <MapPin size={10} /> Directions
+                              </a>
+                            )}
+                          </div>
+                          <div style={{ fontSize: 12, color: "var(--ink-faint)", marginBottom: 3 }}>{r.cuisine}</div>
+                          <div className="otm-food-note">{r.note}</div>
+                          {r.openHours && <div style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 4 }}>{"Hours: " + r.openHours}</div>}
+                        </div>
+                      ))}
                     </div>
-                    <div className="otm-food-note">{r.note}</div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             );
           })}
