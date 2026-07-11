@@ -1181,6 +1181,34 @@ function ItineraryTab({ planData, onUpdatePlan, isAdmin, currentUser, onRequestP
   const [newContactPhone, setNewContactPhone] = useState("");
   const [newActivityFor, setNewActivityFor] = useState({});
 
+  // Live weather state
+  const [wxData, setWxData] = useState(null);
+  const [wxLoading, setWxLoading] = useState(false);
+  const [wxError, setWxError] = useState(null);
+  const [wxStartDate, setWxStartDate] = useState("2026-07-16");
+  const [wxEndDate, setWxEndDate] = useState("2026-07-20");
+
+  const WMO_LABELS = {
+    0: ["☀️", "Clear sky"], 1: ["🌤️", "Mainly clear"], 2: ["⛅", "Partly cloudy"], 3: ["☁️", "Overcast"],
+    45: ["🌫️", "Foggy"], 48: ["🌫️", "Icy fog"],
+    51: ["🌦️", "Light drizzle"], 53: ["🌦️", "Drizzle"], 55: ["🌧️", "Heavy drizzle"],
+    61: ["🌧️", "Slight rain"], 63: ["🌧️", "Rain"], 65: ["🌧️", "Heavy rain"],
+    71: ["🌨️", "Slight snow"], 73: ["❄️", "Snow"], 75: ["❄️", "Heavy snow"],
+    80: ["🌦️", "Showers"], 81: ["🌧️", "Heavy showers"], 82: ["⛈️", "Violent showers"],
+    95: ["⛈️", "Thunderstorm"], 96: ["⛈️", "Thunderstorm + hail"], 99: ["⛈️", "Heavy thunderstorm"],
+  };
+
+  function fetchWeather(start, end) {
+    setWxLoading(true); setWxError(null);
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=11.41&longitude=76.70&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=Asia%2FKolkata&start_date=${start}&end_date=${end}`;
+    fetch(url)
+      .then((r) => { if (!r.ok) throw new Error("API error " + r.status); return r.json(); })
+      .then((data) => { setWxData(data); setWxLoading(false); })
+      .catch((e) => { setWxError(e.message); setWxLoading(false); });
+  }
+
+  React.useEffect(() => { fetchWeather(wxStartDate, wxEndDate); }, []);
+
   const weather = planData.weather || { days: [], tips: [] };
   const food = planData.food || [];
   const restaurants = planData.restaurants || [];
@@ -1283,20 +1311,41 @@ function ItineraryTab({ planData, onUpdatePlan, isAdmin, currentUser, onRequestP
       {tab === "weather" && (
         <div>
           <div className="otm-panel">
-            <div className="otm-panel-head">
-              <h3 className="otm-panel-title"><CloudRain size={16} /> {weather.location || "Weather"}</h3>
+            <div className="otm-panel-head" style={{ flexWrap: "wrap", gap: 8 }}>
+              <h3 className="otm-panel-title"><CloudRain size={16} /> Live Weather — Ooty</h3>
+              <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" }}>
+                <input type="date" className="otm-input" style={{ width: 140, fontSize: 13 }} value={wxStartDate} onChange={(e) => setWxStartDate(e.target.value)} />
+                <span style={{ color: "var(--muted)", fontSize: 12 }}>to</span>
+                <input type="date" className="otm-input" style={{ width: 140, fontSize: 13 }} value={wxEndDate} onChange={(e) => setWxEndDate(e.target.value)} />
+                <button className="otm-btn otm-btn-accent otm-btn-sm" type="button" onClick={() => fetchWeather(wxStartDate, wxEndDate)}>Refresh</button>
+              </div>
             </div>
-            {weather.summary && <p style={{ fontSize: 13.5, color: "var(--ink)", margin: "0 0 16px", lineHeight: 1.55 }}>{weather.summary}</p>}
-            <div className="otm-cards" style={{ marginBottom: 8 }}>
-              {(weather.days || []).map((d, i) => (
-                <div className="otm-card" key={i}>
-                  <div className="otm-card-label">{d.label}</div>
-                  <div className="otm-card-value otm-mono" style={{ fontSize: 19 }}>{d.value}</div>
-                  {d.note && <div style={{ fontSize: 11.5, color: "var(--ink-faint)", marginTop: 4 }}>{d.note}</div>}
+            {wxLoading && <p style={{ color: "var(--muted)", fontSize: 13, margin: "12px 0" }}>Fetching forecast...</p>}
+            {wxError && <p style={{ color: "#e74c3c", fontSize: 13, margin: "12px 0" }}>Could not load weather: {wxError}</p>}
+            {wxData && wxData.daily && (
+              <div>
+                <div className="otm-cards" style={{ marginBottom: 8 }}>
+                  {wxData.daily.time.map((date, i) => {
+                    const code = wxData.daily.weather_code[i];
+                    const [emoji, label] = WMO_LABELS[code] || ["🌡️", "Unknown"];
+                    const tMax = Math.round(wxData.daily.temperature_2m_max[i]);
+                    const tMin = Math.round(wxData.daily.temperature_2m_min[i]);
+                    const rain = wxData.daily.precipitation_sum[i];
+                    const dayLabel = new Date(date + "T12:00:00").toLocaleDateString("en-IN", { weekday: "short", month: "short", day: "numeric" });
+                    return (
+                      <div className="otm-card" key={date}>
+                        <div className="otm-card-label">{dayLabel}</div>
+                        <div style={{ fontSize: 26, margin: "6px 0 2px" }}>{emoji}</div>
+                        <div className="otm-card-value otm-mono" style={{ fontSize: 16 }}>{tMax}° / {tMin}°C</div>
+                        <div style={{ fontSize: 11.5, color: "var(--ink-faint)", marginTop: 4 }}>{label}</div>
+                        {rain > 0 && <div style={{ fontSize: 11.5, color: "var(--accent)", marginTop: 2 }}>{"💧 " + rain.toFixed(1) + " mm"}</div>}
+                      </div>
+                    );
+                  })}
                 </div>
-              ))}
-            </div>
-            {weather.asOf && <p className="otm-hint" style={{ marginTop: 12 }}><Info size={12} style={{ verticalAlign: -2, marginRight: 4 }} />{weather.asOf}</p>}
+                <p className="otm-hint" style={{ marginTop: 8 }}><Info size={12} style={{ verticalAlign: -2, marginRight: 4 }} />Live data from Open-Meteo. Updated each time you tap Refresh.</p>
+              </div>
+            )}
           </div>
           {(weather.tips || []).length > 0 && (
             <div className="otm-panel">
