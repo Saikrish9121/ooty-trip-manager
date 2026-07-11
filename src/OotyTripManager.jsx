@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+﻿import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   LogIn, UserPlus, LayoutDashboard, Wallet, Users, Receipt, ArrowLeftRight,
   MapPin, Plus, Trash2, X, TrainFront,
@@ -19,6 +19,9 @@ const KEYS = {
   LOG: "ooty:expense-log",
   USERS: "ooty:users",
   PLAN: "ooty:plan-data",
+  PACK_REQS: "ooty:packing-requests",
+  CONTACT_REQS: "ooty:contact-requests",
+  PHOTOS: "ooty:photos",
 };
 
 // Bump this when the seeded trip-guide content changes so cached plans refresh.
@@ -643,7 +646,7 @@ function AuthScreen({ members, onRegister, onLogin, authError, busy }) {
               <div className="otm-field">
                 <label>Link to a name already on the budget sheet</label>
                 <select className="otm-select" value={linkChoice} onChange={(e) => setLinkChoice(e.target.value)}>
-                  <option value="__new__">I'm not listed \u2014 add me as a new traveller</option>
+                  <option value="__new__">{"I'm not listed \u2014 add me as a new traveller"}</option>
                   {unclaimed.map((m) => (
                     <option key={m.id} value={m.id}>{m.name}</option>
                   ))}
@@ -659,10 +662,7 @@ function AuthScreen({ members, onRegister, onLogin, authError, busy }) {
             </div>
           )}
           <p className="otm-hint">
-            Data is saved in this browser only \u2014 it is NOT synced between different phones/computers.
-            Everyone in the group should log in from the same shared device/browser to see the same numbers,
-            or ask the organizer for a version with shared online storage. Passwords are hashed before saving,
-            but this is a lightweight tool for a trusted friend group, not bank-grade security.
+            {"Data is saved in this browser only \u2014 it is NOT synced between different phones/computers. Everyone in the group should log in from the same shared device/browser to see the same numbers, or ask the organizer for a version with shared online storage. Passwords are hashed before saving, but this is a lightweight tool for a trusted friend group, not bank-grade security."}
           </p>
         </div>
       </div>
@@ -746,7 +746,7 @@ function DashboardTab({ appData, computedMembers, logEntries }) {
       <div className="otm-topline">
         <div>
           <h1 className="otm-page-title">Trip Dashboard</h1>
-          <p className="otm-page-sub">{appData.tripInfo.destination} \u00b7 {appData.members.length} travellers</p>
+          <p className="otm-page-sub">{appData.tripInfo.destination} · {appData.members.length} travellers</p>
         </div>
       </div>
 
@@ -881,7 +881,7 @@ function MyExpensesTab({ currentUser, appData, logEntries, onAddExpense, onDelet
         </div>
         <p className="otm-hint">
           <b>Personal</b> expenses count only toward your own total. <b>Group</b> expenses mean you fronted money
-          for the whole trip out of pocket \u2014 it's credited back to you automatically, just like the "Group Expenses Paid" column in the original tracker.
+          for the whole trip out of pocket — it's credited back to you automatically, just like the "Group Expenses Paid" column in the original tracker.
         </p>
       </div>
 
@@ -940,7 +940,7 @@ function MembersTab({ appData, computedMembers, logEntries, currentUser, onUpdat
       <div className="otm-topline">
         <div>
           <h1 className="otm-page-title">All Members</h1>
-          <p className="otm-page-sub">{appData.members.length} travellers \u00b7 checking every person's expenditure at a glance</p>
+          <p className="otm-page-sub">{appData.members.length} travellers · checking every person's expenditure at a glance</p>
         </div>
         {isAdmin && <button className="otm-btn otm-btn-accent otm-btn-sm" onClick={() => setShowAdd((s) => !s)}><Plus size={14} /> Add traveller</button>}
       </div>
@@ -980,7 +980,7 @@ function MembersTab({ appData, computedMembers, logEntries, currentUser, onUpdat
                   <td className="otm-num">{formatMoney(m.totalExpenditure, symbol)}</td>
                   <td className="otm-num" style={{ fontWeight: 700, color: m.balance > 0.5 ? "var(--danger)" : m.balance < -0.5 ? "var(--success)" : "inherit" }}>{formatMoney(Math.abs(m.balance), symbol)}</td>
                   <td><StatusStamp status={m.status} /></td>
-                  <td>{(isAdmin || currentUser.memberId === m.id) && <button className="otm-btn otm-btn-ghost otm-btn-sm" onClick={(ev) => { ev.stopPropagation(); startEdit(m); }}><Pencil size={12} /></button>}</td>
+                  <td>{isAdmin && <button className="otm-btn otm-btn-ghost otm-btn-sm" onClick={(ev) => { ev.stopPropagation(); startEdit(m); }}><Pencil size={12} /></button>}</td>
                 </tr>
                 {expandedId === m.id && (
                   <tr>
@@ -1056,7 +1056,7 @@ function CommonExpensesTab({ appData, currentUser, onUpdateExpense, onAddExpense
       <div className="otm-topline">
         <div>
           <h1 className="otm-page-title">Common Expenses</h1>
-          <p className="otm-page-sub">Shared trip costs \u2014 train legs, resort, food, transport & tickets</p>
+          <p className="otm-page-sub">Shared trip costs — train legs, resort, food, transport & tickets</p>
         </div>
         {isAdmin && <button className="otm-btn otm-btn-accent otm-btn-sm" onClick={() => setShowAdd((s) => !s)}><Plus size={14} /> Add category</button>}
       </div>
@@ -1165,16 +1165,16 @@ function SettleUpTab({ appData, computedMembers }) {
               </div>
             );
           })
-        ) : <div className="otm-empty">Everyone is settled up \u2014 nothing to pay!</div>}
+        ) : <div className="otm-empty">Everyone is settled up — nothing to pay!</div>}
       </div>
-      <p className="otm-hint">This uses the same debt-simplification idea Splitwise popularized: instead of everyone paying everyone, only the minimum number of transfers happen. "Mark paid" is just a visual checklist \u2014 it doesn't change anyone's balance.</p>
+      <p className="otm-hint">This uses the same debt-simplification idea Splitwise popularized: instead of everyone paying everyone, only the minimum number of transfers happen. "Mark paid" is just a visual checklist — it doesn't change anyone's balance.</p>
     </div>
   );
 }
 
 /* ============================== ITINERARY & PACKING ============================== */
 
-function ItineraryTab({ planData, onUpdatePlan }) {
+function ItineraryTab({ planData, onUpdatePlan, isAdmin, currentUser, onRequestPacking, onRequestContact, packReqs, contactReqs, onApprovePackReq, onRejectPackReq, onApproveContactReq, onRejectContactReq }) {
   const [tab, setTab] = useState("itinerary");
   const [newItem, setNewItem] = useState("");
   const [newContactName, setNewContactName] = useState("");
@@ -1236,7 +1236,7 @@ function ItineraryTab({ planData, onUpdatePlan }) {
       <div className="otm-topline">
         <div>
           <h1 className="otm-page-title">Itinerary & Trip Guide</h1>
-          <p className="otm-page-sub">The day plan, weather, packing, food & where to eat \u2014 all in one place</p>
+          <p className="otm-page-sub">The day plan, weather, packing, food & where to eat — all in one place</p>
         </div>
       </div>
 
@@ -1251,7 +1251,7 @@ function ItineraryTab({ planData, onUpdatePlan }) {
 
       {tab === "itinerary" && (
         <div>
-          <div className="otm-banner"><Route size={15} /> Route is decided for you: take the Gudalur road both ways (~155\u2013160 km, 4\u20134.5 hrs). Cross the Bandipur forest only 6 AM\u20139 PM.</div>
+          <div className="otm-banner"><Route size={15} /> Route is decided for you: take the Gudalur road both ways (~155–160 km, 4–4.5 hrs). Cross the Bandipur forest only 6 AM–9 PM.</div>
           {planData.days.map((day) => (
             <div className="otm-day-card" key={day.id}>
               <div className="otm-day-title"><CalendarDays size={14} /> {day.title}</div>
@@ -1266,13 +1266,15 @@ function ItineraryTab({ planData, onUpdatePlan }) {
                     </div>
                     {a.detail && <div className="otm-act-detail">{a.detail}</div>}
                   </div>
-                  <button className="otm-btn otm-btn-ghost otm-btn-sm" onClick={() => removeActivity(day.id, a.id)}><Trash2 size={11} /></button>
+                  {isAdmin && <button className="otm-btn otm-btn-ghost otm-btn-sm" onClick={() => removeActivity(day.id, a.id)}><Trash2 size={11} /></button>}
                 </div>
               ))}
-              <div className="otm-inline-form" style={{ marginTop: 10, paddingTop: 10 }}>
-                <input className="otm-input" placeholder="Add activity..." value={newActivityFor[day.id] || ""} onChange={(e) => setNewActivityFor({ ...newActivityFor, [day.id]: e.target.value })} onKeyDown={(e) => { if (e.key === "Enter") addActivity(day.id); }} />
-                <button className="otm-btn otm-btn-ghost otm-btn-sm" onClick={() => addActivity(day.id)}><Plus size={13} /></button>
-              </div>
+              {isAdmin && (
+                <div className="otm-inline-form" style={{ marginTop: 10, paddingTop: 10 }}>
+                  <input className="otm-input" placeholder="Add activity..." value={newActivityFor[day.id] || ""} onChange={(e) => setNewActivityFor({ ...newActivityFor, [day.id]: e.target.value })} onKeyDown={(e) => { if (e.key === "Enter") addActivity(day.id); }} />
+                  <button className="otm-btn otm-btn-ghost otm-btn-sm" onClick={() => addActivity(day.id)}><Plus size={13} /></button>
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -1319,17 +1321,57 @@ function ItineraryTab({ planData, onUpdatePlan }) {
                 <div className={"otm-checklist-item" + (p.checked ? " done" : "")} key={p.id}>
                   <button className="otm-check-btn" onClick={() => togglePacking(p.id)}>{p.checked ? <CheckCircle2 size={17} /> : <Circle size={17} />}</button>
                   <span className="otm-checklist-text">{p.text}</span>
-                  <button className="otm-btn otm-btn-ghost otm-btn-sm" onClick={() => removePacking(p.id)}><Trash2 size={11} /></button>
+                  {isAdmin && <button className="otm-btn otm-btn-ghost otm-btn-sm" onClick={() => removePacking(p.id)}><Trash2 size={11} /></button>}
                 </div>
               ))}
             </div>
           ))}
           <div className="otm-panel">
-            <div className="otm-inline-form" style={{ borderTop: "none", paddingTop: 0, marginTop: 0 }}>
-              <input className="otm-input" placeholder="Add packing item..." value={newItem} onChange={(e) => setNewItem(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") addPacking(); }} />
-              <button className="otm-btn otm-btn-accent otm-btn-sm" onClick={addPacking}><Plus size={13} /> Add</button>
-            </div>
+            {isAdmin ? (
+              <div className="otm-inline-form" style={{ borderTop: "none", paddingTop: 0, marginTop: 0 }}>
+                <input className="otm-input" placeholder="Add packing item..." value={newItem} onChange={(e) => setNewItem(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") addPacking(); }} />
+                <button className="otm-btn otm-btn-accent otm-btn-sm" onClick={addPacking}><Plus size={13} /> Add</button>
+              </div>
+            ) : (
+              <div>
+                <div className="otm-banner" style={{ marginBottom: 10 }}><Info size={14} /> You can check off items. To suggest a new packing item, use the request form below — the trip organizer will approve it.</div>
+                <div className="otm-inline-form" style={{ borderTop: "none", paddingTop: 0, marginTop: 0 }}>
+                  <input className="otm-input" placeholder="Suggest an item..." value={newItem} onChange={(e) => setNewItem(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { if (newItem.trim()) { onRequestPacking({ id: uid("pkr"), text: newItem.trim(), cat: "Requested", requestedBy: currentUser.displayName, requestedAt: new Date().toISOString() }); setNewItem(""); } } }} />
+                  <button className="otm-btn otm-btn-ghost otm-btn-sm" type="button" onClick={() => { if (newItem.trim()) { onRequestPacking({ id: uid("pkr"), text: newItem.trim(), cat: "Requested", requestedBy: currentUser.displayName, requestedAt: new Date().toISOString() }); setNewItem(""); } }}><Plus size={13} /> Request</button>
+                </div>
+              </div>
+            )}
           </div>
+        </div>
+      )}
+
+      {tab === "packing" && isAdmin && packReqs && packReqs.length > 0 && (
+        <div className="otm-panel" style={{ marginTop: 12 }}>
+          <h3 className="otm-panel-title" style={{ marginBottom: 10, color: "var(--accent)" }}>Pending packing requests ({packReqs.length})</h3>
+          {packReqs.map((r) => (
+            <div key={r.id} className="otm-checklist-item" style={{ justifyContent: "space-between" }}>
+              <span className="otm-checklist-text"><b>{r.text}</b> <span style={{ color: "var(--muted)", fontSize: 12 }}>— requested by {r.requestedBy}</span></span>
+              <span style={{ display: "flex", gap: 6 }}>
+                <button className="otm-btn otm-btn-accent otm-btn-sm" type="button" onClick={() => onApprovePackReq(r.id)}>Approve</button>
+                <button className="otm-btn otm-btn-ghost otm-btn-sm" type="button" onClick={() => onRejectPackReq(r.id)}>Reject</button>
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {tab === "contacts" && isAdmin && contactReqs && contactReqs.length > 0 && (
+        <div className="otm-panel" style={{ marginTop: 12 }}>
+          <h3 className="otm-panel-title" style={{ marginBottom: 10, color: "var(--accent)" }}>Pending contact requests ({contactReqs.length})</h3>
+          {contactReqs.map((r) => (
+            <div key={r.id} className="otm-checklist-item" style={{ justifyContent: "space-between" }}>
+              <span className="otm-checklist-text"><b>{r.name}</b> {r.phone} <span style={{ color: "var(--muted)", fontSize: 12 }}>— by {r.requestedBy}</span></span>
+              <span style={{ display: "flex", gap: 6 }}>
+                <button className="otm-btn otm-btn-accent otm-btn-sm" type="button" onClick={() => onApproveContactReq(r.id)}>Approve</button>
+                <button className="otm-btn otm-btn-ghost otm-btn-sm" type="button" onClick={() => onRejectContactReq(r.id)}>Reject</button>
+              </span>
+            </div>
+          ))}
         </div>
       )}
 
@@ -1381,17 +1423,36 @@ function ItineraryTab({ planData, onUpdatePlan }) {
           <h3 className="otm-panel-title" style={{ marginBottom: 12 }}>Key contacts</h3>
           {(planData.contacts || []).map((c) => (
             <div className="otm-checklist-item" key={c.id}>
-              <span className="otm-checklist-text"><b>{c.name}</b> \u2014 {c.phone}</span>
-              <button className="otm-btn otm-btn-ghost otm-btn-sm" onClick={() => removeContact(c.id)}><Trash2 size={11} /></button>
+              <span className="otm-checklist-text"><b>{c.name}</b>{" — "}{c.phone}</span>
+              {isAdmin && <button className="otm-btn otm-btn-ghost otm-btn-sm" onClick={() => removeContact(c.id)}><Trash2 size={11} /></button>}
             </div>
           ))}
-          <div className="otm-inline-form">
-            <input className="otm-input" placeholder="Name" value={newContactName} onChange={(e) => setNewContactName(e.target.value)} />
-            <input className="otm-input" placeholder="Phone" value={newContactPhone} onChange={(e) => setNewContactPhone(e.target.value)} />
-            <button className="otm-btn otm-btn-accent otm-btn-sm" onClick={addContact}><Plus size={13} /> Add</button>
-          </div>
+          {isAdmin ? (
+            <div className="otm-inline-form">
+              <input className="otm-input" placeholder="Name" value={newContactName} onChange={(e) => setNewContactName(e.target.value)} />
+              <input className="otm-input" placeholder="Phone / details" value={newContactPhone} onChange={(e) => setNewContactPhone(e.target.value)} />
+              <button className="otm-btn otm-btn-accent otm-btn-sm" type="button" onClick={addContact}><Plus size={13} /> Add</button>
+            </div>
+          ) : (
+            <div style={{ marginTop: 12 }}>
+              <div className="otm-banner" style={{ marginBottom: 10 }}><Info size={14} /> To add a contact, submit a request below. The trip organizer will review it.</div>
+              <div className="otm-inline-form" style={{ borderTop: "none", paddingTop: 0, marginTop: 0 }}>
+                <input className="otm-input" placeholder="Name" value={newContactName} onChange={(e) => setNewContactName(e.target.value)} />
+                <input className="otm-input" placeholder="Phone / details" value={newContactPhone} onChange={(e) => setNewContactPhone(e.target.value)} />
+                <button className="otm-btn otm-btn-ghost otm-btn-sm" type="button" onClick={() => { if (newContactName.trim() && newContactPhone.trim()) { onRequestContact({ id: uid("ctr"), name: newContactName.trim(), phone: newContactPhone.trim(), requestedBy: currentUser.displayName, requestedAt: new Date().toISOString() }); setNewContactName(""); setNewContactPhone(""); } }}>
+                  <Plus size={13} /> Request
+                </button>
+              </div>
+            </div>
+          )}
           <h3 className="otm-panel-title" style={{ margin: "22px 0 12px" }}>Trip notes</h3>
-          <textarea className="otm-input" rows={7} value={planData.notes || ""} onChange={(e) => onUpdatePlan({ ...planData, notes: e.target.value })} placeholder="Resort address, check-in time, driver number, anything the group should know..." />
+          {isAdmin ? (
+            <textarea className="otm-input" rows={7} value={planData.notes || ""} onChange={(e) => onUpdatePlan({ ...planData, notes: e.target.value })} placeholder="Resort address, check-in time, driver number, anything the group should know..." />
+          ) : (
+            <div style={{ background: "var(--surface-soft)", border: "1px solid var(--border)", borderRadius: 9, padding: "12px 14px", fontSize: 13.5, lineHeight: 1.6, color: "var(--ink-soft)", whiteSpace: "pre-wrap" }}>
+              {planData.notes || "No trip notes yet — the organizer will add details here."}
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -1406,6 +1467,8 @@ export default function OotyTripManager() {
   const [logEntries, setLogEntries] = useState([]);
   const [users, setUsers] = useState([]);
   const [planData, setPlanData] = useState(null);
+  const [packReqs, setPackReqs] = useState([]);
+  const [contactReqs, setContactReqs] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
   const [authError, setAuthError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -1428,10 +1491,14 @@ export default function OotyTripManager() {
       }
       const log = await loadKey(KEYS.LOG, []);
       const us = await loadKey(KEYS.USERS, []);
+      const pr = await loadKey(KEYS.PACK_REQS, []);
+      const cr = await loadKey(KEYS.CONTACT_REQS, []);
       setAppData(app);
       setPlanData(plan);
       setLogEntries(log);
       setUsers(us);
+      setPackReqs(pr);
+      setContactReqs(cr);
       setLoading(false);
     })();
   }, []);
@@ -1493,6 +1560,28 @@ export default function OotyTripManager() {
   async function persistApp(next) { setAppData(next); await saveKey(KEYS.APP, next); }
   async function persistLog(next) { setLogEntries(next); await saveKey(KEYS.LOG, next); }
   async function persistPlan(next) { setPlanData(next); await saveKey(KEYS.PLAN, next); }
+  async function persistPackReqs(next) { setPackReqs(next); await saveKey(KEYS.PACK_REQS, next); }
+  async function persistContactReqs(next) { setContactReqs(next); await saveKey(KEYS.CONTACT_REQS, next); }
+
+  function submitPackReq(req) { persistPackReqs([...packReqs, req]); }
+  function approvePackReq(id) {
+    const req = packReqs.find((r) => r.id === id);
+    if (!req) return;
+    const updated = { ...planData, packing: [...(planData.packing || []), { id: uid("pk"), text: req.text, cat: req.cat || "General", done: false }] };
+    persistPlan(updated);
+    persistPackReqs(packReqs.filter((r) => r.id !== id));
+  }
+  function rejectPackReq(id) { persistPackReqs(packReqs.filter((r) => r.id !== id)); }
+
+  function submitContactReq(req) { persistContactReqs([...contactReqs, req]); }
+  function approveContactReq(id) {
+    const req = contactReqs.find((r) => r.id === id);
+    if (!req) return;
+    const updated = { ...planData, contacts: [...(planData.contacts || []), { id: uid("ct"), name: req.name, phone: req.phone }] };
+    persistPlan(updated);
+    persistContactReqs(contactReqs.filter((r) => r.id !== id));
+  }
+  function rejectContactReq(id) { persistContactReqs(contactReqs.filter((r) => r.id !== id)); }
 
   function addExpense(entry) { persistLog([...logEntries, entry]); }
   function deleteExpense(id) { persistLog(logEntries.filter((e) => e.id !== id)); }
@@ -1520,7 +1609,7 @@ export default function OotyTripManager() {
       <style>{"@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');"}</style>
 
       {loading ? (
-        <div className="otm-loading"><Loader2 size={28} className="otm-spin" /> Loading your trip data\u2026</div>
+        <div className="otm-loading"><Loader2 size={28} className="otm-spin" /> Loading your trip data…</div>
       ) : !currentUser ? (
         <AuthScreen members={appData.members} onRegister={handleRegister} onLogin={handleLogin} authError={authError} busy={busy} />
       ) : (
@@ -1532,7 +1621,7 @@ export default function OotyTripManager() {
             {activeTab === "members" && <MembersTab appData={appData} computedMembers={computedMembers} logEntries={logEntries} currentUser={currentUser} onUpdateMember={updateMember} onAddMember={addMember} onDeleteMember={deleteMember} />}
             {activeTab === "common" && <CommonExpensesTab appData={appData} currentUser={currentUser} onUpdateExpense={updateCommonExpense} onAddExpense={addCommonExpense} onDeleteExpense={deleteCommonExpense} />}
             {activeTab === "settle" && <SettleUpTab appData={appData} computedMembers={computedMembers} />}
-            {activeTab === "itinerary" && <ItineraryTab planData={planData} onUpdatePlan={persistPlan} />}
+            {activeTab === "itinerary" && <ItineraryTab planData={planData} onUpdatePlan={persistPlan} isAdmin={currentUser.role === "admin"} currentUser={currentUser} onRequestPacking={submitPackReq} onRequestContact={submitContactReq} packReqs={packReqs} contactReqs={contactReqs} onApprovePackReq={approvePackReq} onRejectPackReq={rejectPackReq} onApproveContactReq={approveContactReq} onRejectContactReq={rejectContactReq} />}
           </div>
         </div>
       )}
