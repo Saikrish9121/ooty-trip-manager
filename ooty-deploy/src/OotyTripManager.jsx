@@ -623,9 +623,10 @@ function AuthScreen({ members, onRegister, onLogin, authError, busy }) {
             </div>
           )}
           <p className="otm-hint">
-            This tracker is shared with everyone who opens this app \u2014 perfect for your trip group.
-            Data (expenses, balances, itinerary) is visible to all members who log in. Passwords are hashed
-            before saving, but this is a lightweight tool for a trusted friend group, not bank-grade security.
+            Data is saved in this browser only \u2014 it is NOT synced between different phones/computers.
+            Everyone in the group should log in from the same shared device/browser to see the same numbers,
+            or ask the organizer for a version with shared online storage. Passwords are hashed before saving,
+            but this is a lightweight tool for a trusted friend group, not bank-grade security.
           </p>
         </div>
       </div>
