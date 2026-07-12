@@ -1,16 +1,17 @@
-﻿import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   LogIn, UserPlus, LayoutDashboard, Wallet, Users, Receipt, ArrowLeftRight,
   MapPin, Plus, Trash2, X, TrainFront,
   LogOut, Loader2, TrendingUp, TrendingDown, CheckCircle2, Circle,
   Pencil, Save, ChevronDown, ChevronUp, ShieldCheck, Luggage, CalendarDays,
   AlertCircle, Sprout, PiggyBank, CloudRain, UtensilsCrossed, Coffee,
-  Clock, Route, Info, Star
+  Clock, Route, Info, Star, Camera, CheckSquare, Download
 } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   Cell, PieChart, Pie, Legend
 } from "recharts";
+import { isFirebaseConfigured, subscribeToTripData, saveTripKey, uploadFileToFirebase } from "./firebaseClient";
 
 /* ============================== CONSTANTS ============================== */
 
@@ -22,6 +23,7 @@ const KEYS = {
   PACK_REQS: "ooty:packing-requests",
   CONTACT_REQS: "ooty:contact-requests",
   PHOTOS: "ooty:photos",
+  APPROVALS: "ooty:approvals",
 };
 
 // Bump this when the seeded trip-guide content changes so cached plans refresh.
@@ -360,19 +362,10 @@ function computeSettlements(computedMembers) {
   return txns;
 }
 
-async function loadKey(key, fallback) {
-  try {
-    const res = await window.storage.get(key, true);
-    return res && res.value ? JSON.parse(res.value) : fallback;
-  } catch (e) {
-    return fallback;
-  }
-}
-
 async function saveKey(key, value) {
   try {
-    const res = await window.storage.set(key, JSON.stringify(value), true);
-    return !!res;
+    await saveTripKey(key, value);
+    return true;
   } catch (e) {
     return false;
   }
@@ -636,11 +629,11 @@ function AuthScreen({ members, onRegister, onLogin, authError, busy }) {
             <div onKeyDown={loginKeyDown}>
               <div className="otm-field">
                 <label>Username</label>
-                <input className="otm-input" value={loginU} onChange={(e) => setLoginU(e.target.value)} placeholder="e.g. sai.krishna" autoFocus />
+                <input className="otm-input" value={loginU} onChange={(e) => setLoginU(e.target.value)} placeholder="Enter username" autoFocus />
               </div>
               <div className="otm-field">
                 <label>Password</label>
-                <input className="otm-input" type="password" value={loginP} onChange={(e) => setLoginP(e.target.value)} placeholder="\u2022\u2022\u2022\u2022\u2022\u2022" />
+                <input className="otm-input" type="password" value={loginP} onChange={(e) => setLoginP(e.target.value)} placeholder="Enter your password" />
               </div>
               <button className="otm-btn otm-btn-primary" type="button" onClick={submitLogin} disabled={busy}>
                 {busy ? <Loader2 size={15} className="otm-spin" /> : <LogIn size={15} />} Log in
@@ -654,7 +647,7 @@ function AuthScreen({ members, onRegister, onLogin, authError, busy }) {
               </div>
               <div className="otm-field">
                 <label>Choose username</label>
-                <input className="otm-input" value={regUser} onChange={(e) => setRegUser(e.target.value)} placeholder="e.g. sai.krishna" />
+                <input className="otm-input" value={regUser} onChange={(e) => setRegUser(e.target.value)} placeholder="Enter username" />
               </div>
               <div className="otm-field">
                 <label>Password</label>
@@ -662,7 +655,7 @@ function AuthScreen({ members, onRegister, onLogin, authError, busy }) {
               </div>
               <div className="otm-field">
                 <label>Confirm password</label>
-                <input className="otm-input" type="password" value={regPass2} onChange={(e) => setRegPass2(e.target.value)} />
+                <input className="otm-input" type="password" value={regPass2} onChange={(e) => setRegPass2(e.target.value)} placeholder="Re-enter password" />
               </div>
               <div className="otm-field">
                 <label>Link to a name already on the budget sheet</label>
@@ -691,6 +684,160 @@ function AuthScreen({ members, onRegister, onLogin, authError, busy }) {
   );
 }
 
+function ApprovalsTab({ approvals, onApprove, onReject }) {
+  const pending = approvals.filter(a => a.status === "Pending");
+  const history = approvals.filter(a => a.status !== "Pending");
+
+  return (
+    <div>
+      <h2 style={{ marginBottom: 16 }}>Pending Approvals</h2>
+      {pending.length === 0 ? (
+        <div className="otm-empty">All caught up! No pending approvals.</div>
+      ) : (
+        pending.map(a => (
+          <div key={a.id} className="otm-panel" style={{ marginBottom: 12 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>
+                <strong>{a.requestedBy}</strong> is requesting to add a Group Expense:
+                <div style={{ color: "var(--ink-soft)", marginTop: 4 }}>
+                  {a.data.date} &mdash; {a.data.description} ({a.data.category})
+                </div>
+                <div style={{ fontWeight: 600, color: "var(--accent)", marginTop: 4, fontSize: 16 }}>
+                  ₹{a.data.amount}
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: 8 }}>
+                <button className="otm-btn otm-btn-ghost" style={{ color: "var(--danger)" }} onClick={() => onReject(a.id)}><X size={16} /> Reject</button>
+                <button className="otm-btn otm-btn-primary" onClick={() => onApprove(a.id)}><CheckCircle2 size={16} /> Approve</button>
+              </div>
+            </div>
+          </div>
+        ))
+      )}
+
+      {history.length > 0 && (
+        <div style={{ marginTop: 40 }}>
+          <h3 style={{ marginBottom: 12 }}>History</h3>
+          {history.map(a => (
+            <div key={a.id} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid var(--border)", fontSize: 13, color: "var(--ink-soft)" }}>
+              <span>{a.requestedBy}: {a.data.description} (₹{a.data.amount})</span>
+              <strong style={{ color: a.status === "Approved" ? "var(--success)" : "var(--danger)" }}>{a.status}</strong>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PhotosTab({ currentUser, photos, onUpdatePhotos }) {
+  const [uploading, setUploading] = useState(false);
+  const [selected, setSelected] = useState({});
+
+  const handleUpload = async (e) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    setUploading(true);
+    const newPhotos = [];
+    for (let i = 0; i < files.length; i++) {
+      try {
+        const url = await uploadFileToFirebase(files[i], "gallery");
+        newPhotos.push({
+          id: uid("photo"),
+          url,
+          uploadedBy: currentUser.displayName,
+          timestamp: Date.now()
+        });
+      } catch (err) {
+        console.error("Upload failed", err);
+      }
+    }
+    onUpdatePhotos([...photos, ...newPhotos]);
+    setUploading(false);
+  };
+
+  const toggleSelect = (id) => {
+    setSelected(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const selectAll = () => {
+    const all = {};
+    photos.forEach(p => all[p.id] = true);
+    setSelected(all);
+  };
+
+  const deleteSelected = () => {
+    const toDelete = Object.keys(selected).filter(k => selected[k]);
+    if (toDelete.length === 0) return;
+    if (window.confirm(`Delete ${toDelete.length} photos?`)) {
+      onUpdatePhotos(photos.filter(p => !toDelete.includes(p.id)));
+      setSelected({});
+    }
+  };
+
+  const downloadSelected = async () => {
+    const toDownload = Object.keys(selected).filter(k => selected[k]);
+    if (toDownload.length === 0) return;
+    for (const id of toDownload) {
+      const p = photos.find(x => x.id === id);
+      if (p) {
+        try {
+          const resp = await fetch(p.url);
+          const blob = await resp.blob();
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.style.display = "none";
+          a.href = url;
+          a.download = `photo_${id}.jpg`;
+          document.body.appendChild(a);
+          a.click();
+          window.URL.revokeObjectURL(url);
+        } catch(e) {
+          console.error("Download failed", e);
+        }
+      }
+    }
+  };
+
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+        <h2 style={{ margin: 0 }}>Photos & Receipts</h2>
+        <div>
+          <label className="otm-btn otm-btn-primary" style={{ cursor: "pointer", opacity: uploading ? 0.7 : 1 }}>
+            {uploading ? <Loader2 className="otm-spin" size={16} /> : <Camera size={16} />}
+            Upload Photos
+            <input type="file" multiple accept="image/*" style={{ display: "none" }} onChange={handleUpload} disabled={uploading} />
+          </label>
+        </div>
+      </div>
+      
+      {photos.length > 0 && (
+        <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
+          <button className="otm-btn otm-btn-ghost" onClick={selectAll}><CheckSquare size={16} /> Select All</button>
+          <button className="otm-btn otm-btn-ghost" onClick={downloadSelected}><Download size={16} /> Download Selected</button>
+          <button className="otm-btn otm-btn-danger" onClick={deleteSelected}><Trash2 size={16} /> Delete Selected</button>
+        </div>
+      )}
+
+      {photos.length === 0 ? (
+        <div className="otm-empty">No photos uploaded yet.</div>
+      ) : (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))", gap: 10 }}>
+          {photos.map(p => (
+            <div key={p.id} style={{ position: "relative", cursor: "pointer", border: selected[p.id] ? "3px solid var(--accent)" : "3px solid transparent", borderRadius: 8 }} onClick={() => toggleSelect(p.id)}>
+              <img src={p.url} alt="Uploaded" style={{ width: "100%", height: 120, objectFit: "cover", borderRadius: 5, display: "block" }} />
+              <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "rgba(0,0,0,0.5)", color: "#fff", fontSize: 10, padding: 4, borderBottomLeftRadius: 5, borderBottomRightRadius: 5 }}>
+                {p.uploadedBy}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ============================== SIDEBAR ============================== */
 
 const NAV_ITEMS = [
@@ -700,9 +847,11 @@ const NAV_ITEMS = [
   { key: "common", label: "Common Expenses", icon: Receipt },
   { key: "settle", label: "Settle Up", icon: ArrowLeftRight },
   { key: "itinerary", label: "Itinerary & Packing", icon: MapPin },
+  { key: "photos", label: "Photos & Receipts", icon: Camera },
 ];
 
-function Sidebar({ active, setActive, currentUser, tripName, onLogout }) {
+function Sidebar({ active, setActive, currentUser, tripName, onLogout, pendingApprovals }) {
+  const isAdmin = currentUser.role === "admin";
   const initials = (currentUser.displayName || "?").split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase();
   return (
     <div className="otm-sidebar">
@@ -722,6 +871,16 @@ function Sidebar({ active, setActive, currentUser, tripName, onLogout }) {
             </button>
           );
         })}
+        {isAdmin && (
+          <button className={"otm-nav-btn" + (active === "approvals" ? " active" : "")} onClick={() => setActive("approvals")}>
+            <ShieldCheck size={16} /> Approvals
+            {pendingApprovals > 0 && (
+              <span style={{ background: "var(--danger)", color: "#fff", padding: "2px 6px", borderRadius: 10, fontSize: 11, marginLeft: "auto", fontWeight: 700 }}>
+                {pendingApprovals}
+              </span>
+            )}
+          </button>
+        )}
       </div>
       <div className="otm-sidebar-foot">
         <div className="otm-user-chip">
@@ -764,6 +923,9 @@ function DashboardTab({ appData, computedMembers, logEntries }) {
 
   return (
     <div>
+      <div style={{ width: "100%", height: 180, borderRadius: 12, overflow: "hidden", marginBottom: 20, boxShadow: "0 4px 12px rgba(0,0,0,0.15)" }}>
+        <img src="/src/assets/ooty_hero_landscape.jpg" alt="Ooty Landscape" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+      </div>
       <div className="otm-topline">
         <div>
           <h1 className="otm-page-title">Trip Dashboard</h1>
@@ -819,7 +981,7 @@ function DashboardTab({ appData, computedMembers, logEntries }) {
 
 /* ============================== MY EXPENSES ============================== */
 
-function MyExpensesTab({ currentUser, appData, logEntries, onAddExpense, onDeleteExpense }) {
+function MyExpensesTab({ currentUser, appData, logEntries, onAddExpense, onDeleteExpense, onAddApproval }) {
   const symbol = appData.tripInfo.currency;
   const member = appData.members.find((m) => m.id === currentUser.memberId);
   const [date, setDate] = useState("");
@@ -838,16 +1000,30 @@ function MyExpensesTab({ currentUser, appData, logEntries, onAddExpense, onDelet
   function submit(e) {
     if (e && e.preventDefault) e.preventDefault();
     if (!desc.trim() || !amount || Number(amount) <= 0) return;
-    onAddExpense({
+    const exp = {
       id: uid("exp"),
       memberId: member.id,
-      date: date || new Date().toISOString().slice(0, 10),
+      date: date || new Date().toISOString().split("T")[0],
       description: desc.trim(),
       amount: Number(amount),
       type,
       category,
-    });
-    setDesc(""); setAmount(""); setDate("");
+    };
+    if (type === "Group" && currentUser.role !== "admin") {
+      onAddApproval({
+        id: uid("appr"),
+        type: "Expense",
+        requestedBy: currentUser.displayName,
+        status: "Pending",
+        data: exp
+      });
+      alert("Expense sent to the Organizer for approval!");
+    } else {
+      onAddExpense(exp);
+    }
+    setDesc("");
+    setAmount("");
+    setDate("");
   }
 
   return (
@@ -1305,6 +1481,11 @@ function ItineraryTab({ planData, onUpdatePlan, isAdmin, currentUser, onRequestP
             <div className="otm-day-card" key={day.id}>
               <div className="otm-day-title"><CalendarDays size={14} /> {day.title}</div>
               {day.subtitle && <div style={{ fontSize: 12.5, color: "var(--ink-soft)", margin: "-4px 0 12px", paddingLeft: 22 }}>{day.subtitle}</div>}
+              {day.title.includes("Day 3") && (
+                <div style={{ width: "100%", height: 140, borderRadius: 10, overflow: "hidden", marginBottom: 15, marginTop: 5, boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}>
+                  <img src="/src/assets/ooty_toy_train.jpg" alt="Nilgiri Mountain Railway" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                </div>
+              )}
               {day.activities.map((a) => (
                 <div className={"otm-act" + (a.done ? " done" : "")} key={a.id}>
                   <button className="otm-check-btn" onClick={() => toggleActivity(day.id, a.id)} style={{ marginTop: 2 }}>{a.done ? <CheckCircle2 size={17} /> : <Circle size={17} />}</button>
@@ -1452,6 +1633,9 @@ function ItineraryTab({ planData, onUpdatePlan, isAdmin, currentUser, onRequestP
 
       {tab === "food" && (
         <div>
+          <div style={{ width: "100%", height: 160, borderRadius: 12, overflow: "hidden", marginBottom: 20, boxShadow: "0 4px 12px rgba(0,0,0,0.15)" }}>
+            <img src="/src/assets/south_indian_meals.jpg" alt="South Indian Meals" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+          </div>
           {["Mysore", "En Route", "Pykara", "Ooty", "Coonoor"].map((zone) => {
             const items = food.filter((f) => (f.zone || "Ooty") === zone);
             if (!items.length) return null;
@@ -1573,34 +1757,40 @@ export default function OotyTripManager() {
   const [authError, setAuthError] = useState("");
   const [busy, setBusy] = useState(false);
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [photos, setPhotos] = useState([]);
+  const [approvals, setApprovals] = useState([]);
 
   useEffect(() => {
-    (async () => {
-      let app = await loadKey(KEYS.APP, null);
+    if (!isFirebaseConfigured()) {
+      setLoading(false);
+      return;
+    }
+    const unsubscribe = subscribeToTripData(async (data) => {
+      const getVal = (key) => data[key.replace("ooty:", "")];
+      
+      let app = getVal(KEYS.APP);
       if (!app) { app = seedAppData(); await saveKey(KEYS.APP, app); }
       if (!app.tripInfo || !app.tripInfo.startDate) {
         app = { ...app, tripInfo: { ...(app.tripInfo || {}), startDate: "2026-07-17", endDate: "2026-07-20", destination: "Mysore \u2192 Ooty, Nilgiris" } };
         await saveKey(KEYS.APP, app);
       }
-      let plan = await loadKey(KEYS.PLAN, null);
-      // Load / upgrade the trip guide. Older cached plans lack weather/food/restaurants;
-      // refresh them to the current seeded content (the guide is reference data, not user-entered).
+      let plan = getVal(KEYS.PLAN);
       if (!plan || plan.schema !== PLAN_SCHEMA) {
         plan = { ...seedPlanData(), schema: PLAN_SCHEMA };
         await saveKey(KEYS.PLAN, plan);
       }
-      const log = await loadKey(KEYS.LOG, []);
-      const us = await loadKey(KEYS.USERS, []);
-      const pr = await loadKey(KEYS.PACK_REQS, []);
-      const cr = await loadKey(KEYS.CONTACT_REQS, []);
+      
       setAppData(app);
       setPlanData(plan);
-      setLogEntries(log);
-      setUsers(us);
-      setPackReqs(pr);
-      setContactReqs(cr);
+      setLogEntries(getVal(KEYS.LOG) || []);
+      setUsers(getVal(KEYS.USERS) || []);
+      setPackReqs(getVal(KEYS.PACK_REQS) || []);
+      setContactReqs(getVal(KEYS.CONTACT_REQS) || []);
+      setPhotos(getVal(KEYS.PHOTOS) || []);
+      setApprovals(getVal(KEYS.APPROVALS) || []);
       setLoading(false);
-    })();
+    });
+    return () => unsubscribe();
   }, []);
 
   const computedMembers = useMemo(() => {
@@ -1660,6 +1850,8 @@ export default function OotyTripManager() {
   async function persistApp(next) { setAppData(next); await saveKey(KEYS.APP, next); }
   async function persistLog(next) { setLogEntries(next); await saveKey(KEYS.LOG, next); }
   async function persistPlan(next) { setPlanData(next); await saveKey(KEYS.PLAN, next); }
+  async function persistPhotos(next) { setPhotos(next); await saveKey(KEYS.PHOTOS, next); }
+  async function persistApprovals(next) { setApprovals(next); await saveKey(KEYS.APPROVALS, next); }
   async function persistPackReqs(next) { setPackReqs(next); await saveKey(KEYS.PACK_REQS, next); }
   async function persistContactReqs(next) { setContactReqs(next); await saveKey(KEYS.CONTACT_REQS, next); }
 
@@ -1686,6 +1878,19 @@ export default function OotyTripManager() {
   function addExpense(entry) { persistLog([...logEntries, entry]); }
   function deleteExpense(id) { persistLog(logEntries.filter((e) => e.id !== id)); }
 
+  function addApproval(req) { persistApprovals([...approvals, req]); }
+  function approveApproval(id) {
+    const req = approvals.find((r) => r.id === id);
+    if (!req) return;
+    if (req.type === "Expense") {
+      addExpense(req.data);
+    }
+    persistApprovals(approvals.map((a) => a.id === id ? { ...a, status: "Approved" } : a));
+  }
+  function rejectApproval(id) {
+    persistApprovals(approvals.map((a) => a.id === id ? { ...a, status: "Rejected" } : a));
+  }
+
   function updateMember(id, patch) {
     persistApp({ ...appData, members: appData.members.map((m) => m.id === id ? { ...m, ...patch } : m) });
   }
@@ -1708,20 +1913,28 @@ export default function OotyTripManager() {
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <style>{"@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');"}</style>
 
-      {loading ? (
+      {(!isFirebaseConfigured()) ? (
+        <div className="otm-empty" style={{ margin: 40, color: "var(--danger)" }}>
+          <AlertCircle size={40} style={{ marginBottom: 15 }} />
+          <h2>Firebase Configuration Missing</h2>
+          <p>Please configure your Firebase variables in the <code>.env</code> file.</p>
+        </div>
+      ) : loading ? (
         <div className="otm-loading"><Loader2 size={28} className="otm-spin" /> Loading your trip data…</div>
       ) : !currentUser ? (
         <AuthScreen members={appData.members} onRegister={handleRegister} onLogin={handleLogin} authError={authError} busy={busy} />
       ) : (
         <div className="otm-shell">
-          <Sidebar active={activeTab} setActive={setActiveTab} currentUser={currentUser} tripName={appData.tripInfo.name} onLogout={handleLogout} />
+          <Sidebar active={activeTab} setActive={setActiveTab} currentUser={currentUser} tripName={appData.tripInfo.name} onLogout={handleLogout} pendingApprovals={approvals.filter(a => a.status === "Pending").length} />
           <div className="otm-main">
             {activeTab === "dashboard" && <DashboardTab appData={appData} computedMembers={computedMembers} logEntries={logEntries} />}
-            {activeTab === "myexpenses" && <MyExpensesTab currentUser={currentUser} appData={appData} logEntries={logEntries} onAddExpense={addExpense} onDeleteExpense={deleteExpense} />}
+            {activeTab === "myexpenses" && <MyExpensesTab currentUser={currentUser} appData={appData} logEntries={logEntries} onAddExpense={addExpense} onDeleteExpense={deleteExpense} onAddApproval={addApproval} />}
             {activeTab === "members" && <MembersTab appData={appData} computedMembers={computedMembers} logEntries={logEntries} currentUser={currentUser} onUpdateMember={updateMember} onAddMember={addMember} onDeleteMember={deleteMember} />}
             {activeTab === "common" && <CommonExpensesTab appData={appData} currentUser={currentUser} onUpdateExpense={updateCommonExpense} onAddExpense={addCommonExpense} onDeleteExpense={deleteCommonExpense} />}
             {activeTab === "settle" && <SettleUpTab appData={appData} computedMembers={computedMembers} />}
             {activeTab === "itinerary" && <ItineraryTab planData={planData} onUpdatePlan={persistPlan} isAdmin={currentUser.role === "admin"} currentUser={currentUser} onRequestPacking={submitPackReq} onRequestContact={submitContactReq} packReqs={packReqs} contactReqs={contactReqs} onApprovePackReq={approvePackReq} onRejectPackReq={rejectPackReq} onApproveContactReq={approveContactReq} onRejectContactReq={rejectContactReq} />}
+            {activeTab === "photos" && <PhotosTab currentUser={currentUser} photos={photos} onUpdatePhotos={persistPhotos} />}
+            {activeTab === "approvals" && currentUser.role === "admin" && <ApprovalsTab approvals={approvals} onApprove={approveApproval} onReject={rejectApproval} />}
           </div>
         </div>
       )}

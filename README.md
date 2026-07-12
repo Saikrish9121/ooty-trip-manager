@@ -60,14 +60,10 @@ in `src/main.jsx`. That means:
   their own separate copy. (The original Claude artifact used a shared store;
   a plain static site has no built-in server to share data.)
 
-If you need the whole group to see the **same** expenses and balances, replace
-the `window.storage` shim in `src/main.jsx` with a real backend. The easiest
-free option is Supabase:
+If you need the whole group to see the **same** expenses and balances, configure Firebase Realtime Database and Storage:
 
-1. Create a free project at supabase.com and a table `kv (key text primary key,
-   value text)`.
-2. Rewrite the shim's `get`/`set`/`delete`/`list` to call Supabase instead of
-   localStorage (the app only needs those four async methods).
+1. Create a Firebase project at console.firebase.google.com.
+2. Enable Realtime Database (Test Mode) and Cloud Storage.
+3. Configure the environment variables in your `.env` file (see `.env.example` for details).
 
-No other code changes are required — the rest of the app just calls
-`window.storage.get/set/delete/list`.
+Once configured, the app will automatically synchronize all databases and photos in real time across different devices and browsers!
