@@ -16,8 +16,38 @@ import { isFirebaseConfigured, subscribeToTripData, saveTripKey, uploadFileToFir
 import heroImage from "./assets/ooty_hero_landscape.jpg";
 import toyTrainImage from "./assets/ooty_toy_train.jpg";
 import southIndianMealsImage from "./assets/south_indian_meals.jpg";
+import photoUrls from "./assets/photo_urls.json";
 
 /* ============================== CONSTANTS ============================== */
+
+const imageMap = [
+  { match: "Bandipur", img: photoUrls["bandipur.jpg"] },
+  { match: "Pykara Falls", img: photoUrls["pykara_falls.jpg"] },
+  { match: "Pykara Lake", img: photoUrls["pykara_lake.jpg"] },
+  { match: "Botanical Garden", img: photoUrls["botanical_garden.jpg"] },
+  { match: "Doddabetta", img: photoUrls["doddabetta.jpg"] },
+  { match: "Ooty Lake", img: photoUrls["ooty_lake.jpg"] },
+  { match: "Ketti Valley", img: photoUrls["ketti_valley.jpg"] },
+  { match: "Sim's Park", img: photoUrls["sims_park.jpg"] },
+  { match: "Dolphin's Nose", img: photoUrls["dolphins_nose.jpg"] },
+  { match: "Mudumalai", img: photoUrls["mudumalai.jpg"] },
+  { match: "Chamundeshwari", img: photoUrls["chamundeshwari.jpg"] },
+  { match: "Mysore Palace", img: photoUrls["mysore_palace.jpg"] },
+  { match: "Mysore Pak", img: photoUrls["mysore_pak.jpg"] },
+  { match: "Dosa", img: photoUrls["dosa.jpg"] },
+  { match: "Vada", img: photoUrls["vada.jpg"] },
+  { match: "Biryani", img: photoUrls["biryani.jpg"] },
+  { match: "Filter Coffee", img: photoUrls["filter_coffee.jpg"] },
+];
+
+function getImageForText(text) {
+  if (!text) return null;
+  const t = text.toLowerCase();
+  for (const item of imageMap) {
+    if (t.includes(item.match.toLowerCase()) && item.img) return item.img;
+  }
+  return null;
+}
 
 const KEYS = {
   APP: "ooty:app-data",
@@ -1625,6 +1655,11 @@ function ItineraryTab({ planData, onUpdatePlan, isAdmin, currentUser, onRequestP
                       )}
                     </div>
                     {a.detail && <div className="otm-act-detail">{a.detail}</div>}
+                    {getImageForText(a.text) && (
+                      <div style={{ marginTop: 10, width: "100%", height: 160, borderRadius: 8, overflow: "hidden", boxShadow: "0 2px 6px rgba(0,0,0,0.1)" }}>
+                        <img src={getImageForText(a.text)} alt={a.text} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                      </div>
+                    )}
                   </div>
                   {isAdmin && <button className="otm-btn otm-btn-ghost otm-btn-sm" onClick={() => removeActivity(day.id, a.id)}><Trash2 size={11} /></button>}
                 </div>
@@ -1772,6 +1807,11 @@ function ItineraryTab({ planData, onUpdatePlan, isAdmin, currentUser, onRequestP
                     <div className="otm-food-name">{f.name}</div>
                     <div className="otm-food-note">{f.note}</div>
                     {f.bestAt && <div style={{ fontSize: 12, color: "var(--accent)", marginTop: 4 }}>{"Best at: " + f.bestAt}</div>}
+                    {getImageForText(f.name) && (
+                      <div style={{ marginTop: 10, width: "100%", height: 160, borderRadius: 8, overflow: "hidden", boxShadow: "0 2px 6px rgba(0,0,0,0.1)" }}>
+                        <img src={getImageForText(f.name)} alt={f.name} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -1815,6 +1855,11 @@ function ItineraryTab({ planData, onUpdatePlan, isAdmin, currentUser, onRequestP
                           <div style={{ fontSize: 12, color: "var(--ink-faint)", marginBottom: 3 }}>{r.cuisine}</div>
                           <div className="otm-food-note">{r.note}</div>
                           {r.openHours && <div style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 4 }}>{"Hours: " + r.openHours}</div>}
+                          {getImageForText(r.name) && (
+                            <div style={{ marginTop: 10, width: "100%", height: 160, borderRadius: 8, overflow: "hidden", boxShadow: "0 2px 6px rgba(0,0,0,0.1)" }}>
+                              <img src={getImageForText(r.name)} alt={r.name} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>
