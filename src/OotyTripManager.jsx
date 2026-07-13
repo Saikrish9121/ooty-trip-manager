@@ -13,6 +13,7 @@ import {
 } from "recharts";
 import JSZip from "jszip";
 import { isFirebaseConfigured, subscribeToTripData, saveTripKey, uploadFileToFirebase } from "./firebaseClient";
+import heroImage from "./assets/ooty_hero_landscape.jpg";
 
 /* ============================== CONSTANTS ============================== */
 
@@ -1024,7 +1025,7 @@ function DashboardTab({ appData, computedMembers, logEntries }) {
   return (
     <div>
       <div style={{ width: "100%", height: 180, borderRadius: 12, overflow: "hidden", marginBottom: 20, boxShadow: "0 4px 12px rgba(0,0,0,0.15)" }}>
-        <img src="/src/assets/ooty_hero_landscape.jpg" alt="Ooty Landscape" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+        <img src={heroImage} alt="Ooty Landscape" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
       </div>
       <div className="otm-topline">
         <div>
