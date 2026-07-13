@@ -1039,6 +1039,7 @@ function MyExpensesTab({ currentUser, appData, logEntries, onAddExpense, onDelet
         <Card label="Group Spends Credit" value={formatMoney(computed.groupCredit, symbol)} icon={Receipt} />
         <Card label="Share of Common Costs" value={formatMoney(computed.shareOfCommon, symbol)} icon={TrainFront} />
         <Card label="Personal Spends" value={formatMoney(computed.personal, symbol)} icon={Wallet} />
+        <Card label="Total Expenditure" value={formatMoney(computed.shareOfCommon + computed.personal, symbol)} icon={TrendingUp} />
         <Card label="Final Balance" value={formatMoney(Math.abs(computed.balance), symbol)} icon={ArrowLeftRight} tone={computed.balance > 0.5 ? "neg" : computed.balance < -0.5 ? "pos" : undefined} />
       </div>
 
