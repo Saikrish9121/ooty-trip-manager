@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import OotyTripManager from "./OotyTripManager.jsx";
+import "./index.css";
 
 /*
   The app was originally built for the Claude Artifacts runtime, which provides a

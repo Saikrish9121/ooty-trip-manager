@@ -381,178 +381,6 @@ async function saveKey(key, value) {
 
 /* ============================== STYLES ============================== */
 
-const STYLES = `
-.otm-root {
-  --bg: #EDF1E8;
-  --surface: #FFFFFF;
-  --surface-soft: #F6F9F2;
-  --ink: #1A2A1F;
-  --ink-soft: #52604F;
-  --ink-faint: #8B9686;
-  --primary: #234B36;
-  --primary-light: #3E6B4E;
-  --primary-dark: #16332400;
-  --accent: #C1892E;
-  --accent-soft: #F0DBA8;
-  --danger: #A64F3E;
-  --danger-soft: #F4DCD5;
-  --success: #2F7A52;
-  --success-soft: #D9EBDD;
-  --border: #DBE3D3;
-  --shadow: rgba(24, 38, 26, 0.10);
-  font-family: 'IBM Plex Sans', system-ui, sans-serif;
-  color: var(--ink);
-  background: var(--bg);
-  min-height: 100vh;
-  width: 100%;
-}
-.otm-root * { box-sizing: border-box; }
-.otm-display { font-family: 'Fraunces', Georgia, serif; }
-.otm-mono { font-family: 'IBM Plex Mono', monospace; }
-
-.otm-loading { display:flex; align-items:center; justify-content:center; min-height:100vh; flex-direction:column; gap:12px; color:var(--ink-soft); }
-.otm-spin { animation: otm-spin 1s linear infinite; }
-@keyframes otm-spin { to { transform: rotate(360deg); } }
-
-/* ---------- Auth screen ---------- */
-.otm-auth-wrap { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; background:
-  radial-gradient(circle at 15% 10%, #2c5a41 0%, transparent 45%),
-  radial-gradient(circle at 85% 90%, #1a3527 0%, transparent 50%),
-  var(--primary); }
-.otm-auth-card { width:100%; max-width:440px; background:var(--surface); border-radius:18px; box-shadow: 0 24px 60px rgba(0,0,0,0.28); overflow:hidden; }
-.otm-auth-head { background:var(--primary); color:#fff; padding:28px 28px 22px; position:relative; }
-.otm-auth-head h1 { margin:0 0 4px; font-size:26px; font-weight:600; letter-spacing:0.2px; }
-.otm-auth-head p { margin:0; color:#cfe0d3; font-size:13px; }
-.otm-leaf { position:absolute; right:22px; top:22px; opacity:0.55; }
-.otm-auth-body { padding:24px 28px 28px; }
-.otm-auth-tabs { display:flex; gap:6px; margin-bottom:20px; background:var(--surface-soft); border-radius:10px; padding:4px; }
-.otm-auth-tab { flex:1; text-align:center; padding:9px 0; border-radius:8px; font-size:13.5px; font-weight:600; cursor:pointer; color:var(--ink-soft); border:none; background:transparent; }
-.otm-auth-tab.active { background:var(--primary); color:#fff; }
-.otm-field { margin-bottom:14px; }
-.otm-field label { display:block; font-size:12.5px; font-weight:600; color:var(--ink-soft); margin-bottom:5px; letter-spacing:0.2px; }
-.otm-input, .otm-select, textarea.otm-input {
-  width:100%; padding:10px 12px; border:1.5px solid var(--border); border-radius:9px; font-size:14px;
-  background:var(--surface); color:var(--ink); font-family:inherit;
-}
-.otm-input:focus, .otm-select:focus, textarea.otm-input:focus { outline:2px solid var(--accent); outline-offset:1px; border-color:var(--accent); }
-.otm-check-row { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--ink-soft); margin:10px 0 16px; }
-.otm-btn {
-  display:inline-flex; align-items:center; justify-content:center; gap:7px;
-  padding:11px 18px; border-radius:10px; font-size:14px; font-weight:600; cursor:pointer;
-  border:1.5px solid transparent; transition: transform 0.05s ease;
-}
-.otm-btn:active { transform: scale(0.98); }
-.otm-btn-primary { background:var(--primary); color:#fff; width:100%; }
-.otm-btn-primary:hover { background:var(--primary-light); }
-.otm-btn-accent { background:var(--accent); color:#fff; }
-.otm-btn-ghost { background:transparent; color:var(--primary); border-color:var(--border); }
-.otm-btn-ghost:hover { background:var(--surface-soft); }
-.otm-btn-danger { background:transparent; color:var(--danger); border-color:var(--danger-soft); }
-.otm-btn-danger:hover { background:var(--danger-soft); }
-.otm-btn-sm { padding:6px 11px; font-size:12.5px; border-radius:8px; }
-.otm-err { background:var(--danger-soft); color:#7a2e1f; padding:9px 12px; border-radius:8px; font-size:13px; margin-bottom:14px; display:flex; gap:8px; align-items:flex-start; }
-.otm-hint { font-size:12px; color:var(--ink-faint); margin-top:10px; line-height:1.5; }
-
-/* ---------- App shell ---------- */
-.otm-shell { display:flex; min-height:100vh; }
-.otm-sidebar { width:236px; background:var(--primary); color:#fff; display:flex; flex-direction:column; padding:22px 14px; flex-shrink:0; }
-.otm-brand { display:flex; align-items:center; gap:9px; padding:0 8px 20px; }
-.otm-brand-name { font-family:'Fraunces', serif; font-size:18px; font-weight:600; line-height:1.15; }
-.otm-brand-sub { font-size:11px; color:#bcd2c1; }
-.otm-nav { display:flex; flex-direction:column; gap:3px; flex:1; }
-.otm-nav-btn { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:9px; color:#dbe8dd; background:transparent; border:none; font-size:13.5px; font-weight:500; cursor:pointer; text-align:left; }
-.otm-nav-btn:hover { background:rgba(255,255,255,0.08); color:#fff; }
-.otm-nav-btn.active { background:rgba(255,255,255,0.16); color:#fff; font-weight:600; }
-.otm-nav-btn.active svg { color:var(--accent-soft); }
-.otm-sidebar-foot { border-top:1px solid rgba(255,255,255,0.15); padding-top:14px; margin-top:10px; }
-.otm-user-chip { display:flex; align-items:center; gap:9px; padding:8px; border-radius:9px; margin-bottom:8px; }
-.otm-avatar { width:32px; height:32px; border-radius:50%; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; flex-shrink:0; }
-.otm-user-name { font-size:13px; font-weight:600; color:#fff; line-height:1.2; }
-.otm-user-role { font-size:11px; color:#a9c6ae; }
-.otm-logout { width:100%; }
-
-.otm-main { flex:1; padding:30px 34px 60px; max-width:1180px; margin:0 auto; width:100%; }
-.otm-topline { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:26px; gap:16px; flex-wrap:wrap; }
-.otm-page-title { font-family:'Fraunces', serif; font-size:26px; font-weight:600; margin:0 0 4px; }
-.otm-page-sub { font-size:13.5px; color:var(--ink-soft); margin:0; }
-
-.otm-cards { display:grid; grid-template-columns:repeat(auto-fit, minmax(190px,1fr)); gap:14px; margin-bottom:26px; }
-.otm-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px 18px; box-shadow:0 1px 2px var(--shadow); }
-.otm-card-label { font-size:11.5px; text-transform:uppercase; letter-spacing:0.6px; color:var(--ink-faint); font-weight:600; margin-bottom:8px; display:flex; align-items:center; gap:6px; }
-.otm-card-value { font-family:'IBM Plex Mono', monospace; font-size:22px; font-weight:600; color:var(--ink); }
-.otm-card-value.neg { color:var(--danger); }
-.otm-card-value.pos { color:var(--success); }
-
-.otm-panel { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:22px; margin-bottom:24px; }
-.otm-panel-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px; }
-.otm-panel-title { font-size:15.5px; font-weight:700; margin:0; display:flex; align-items:center; gap:8px; }
-
-.otm-table { width:100%; border-collapse:collapse; font-size:13px; }
-.otm-table th { text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:0.4px; color:var(--ink-faint); font-weight:700; padding:8px 10px; border-bottom:2px solid var(--border); white-space:nowrap; }
-.otm-table td { padding:9px 10px; border-bottom:1px solid var(--border); vertical-align:middle; }
-.otm-table tr:last-child td { border-bottom:none; }
-.otm-table tr.clickable { cursor:pointer; }
-.otm-table tr.clickable:hover { background:var(--surface-soft); }
-.otm-num { font-family:'IBM Plex Mono', monospace; text-align:right; white-space:nowrap; }
-
-.otm-stamp { display:inline-flex; align-items:center; gap:5px; padding:4px 10px 4px 8px; border-radius:20px; font-size:11px; font-weight:700; letter-spacing:0.4px; text-transform:uppercase; border:1.5px solid; }
-.otm-stamp.topay { color:#7a2e1f; border-color:var(--danger); background:var(--danger-soft); }
-.otm-stamp.toreceive { color:#1d5c3b; border-color:var(--success); background:var(--success-soft); }
-.otm-stamp.settled { color:var(--ink-soft); border-color:var(--border); background:var(--surface-soft); }
-
-.otm-empty { text-align:center; padding:34px 10px; color:var(--ink-faint); font-size:13.5px; }
-.otm-inline-form { display:flex; gap:8px; flex-wrap:wrap; align-items:flex-end; margin-top:14px; padding-top:14px; border-top:1px dashed var(--border); }
-.otm-inline-form .otm-field { margin-bottom:0; flex:1; min-width:120px; }
-
-.otm-track { display:flex; align-items:center; gap:10px; margin:6px 0; }
-.otm-track-name { font-weight:600; font-size:13.5px; background:var(--surface-soft); padding:6px 12px; border-radius:20px; border:1px solid var(--border); }
-.otm-track-line { flex:1; height:0; border-top:2px dashed var(--accent-soft); position:relative; min-width:40px; }
-.otm-track-amt { font-family:'IBM Plex Mono', monospace; font-weight:700; color:var(--accent); font-size:13px; background:#fff; padding:2px 8px; }
-
-.otm-checklist-item { display:flex; align-items:center; gap:10px; padding:8px 4px; border-bottom:1px solid var(--border); }
-.otm-checklist-item:last-child { border-bottom:none; }
-.otm-checklist-item.done .otm-checklist-text { text-decoration:line-through; color:var(--ink-faint); }
-.otm-checklist-text { flex:1; font-size:13.5px; }
-.otm-check-btn { cursor:pointer; color:var(--primary); background:none; border:none; display:flex; padding:0; }
-
-.otm-day-card { border:1px solid var(--border); border-radius:12px; padding:16px; margin-bottom:14px; background:var(--surface-soft); }
-.otm-day-title { font-weight:700; font-size:14.5px; margin-bottom:10px; display:flex; align-items:center; gap:8px; }
-
-.otm-act { display:flex; gap:10px; padding:10px 4px; border-bottom:1px solid var(--border); align-items:flex-start; }
-.otm-act:last-of-type { border-bottom:none; }
-.otm-act.done .otm-act-text { text-decoration:line-through; color:var(--ink-faint); }
-.otm-act-head { display:flex; align-items:baseline; gap:9px; flex-wrap:wrap; }
-.otm-act-text { font-size:13.5px; font-weight:600; }
-.otm-time { font-family:'IBM Plex Mono', monospace; font-size:11px; font-weight:600; color:var(--accent); background:#fff; border:1px solid var(--accent-soft); padding:2px 7px; border-radius:6px; white-space:nowrap; display:inline-flex; align-items:center; gap:3px; }
-.otm-act-detail { font-size:12.5px; color:var(--ink-soft); line-height:1.5; margin-top:4px; }
-
-.otm-food-item { padding:11px 2px; border-bottom:1px solid var(--border); }
-.otm-food-item:last-child { border-bottom:none; }
-.otm-food-name { font-weight:700; font-size:14px; margin-bottom:3px; }
-.otm-food-note { font-size:12.5px; color:var(--ink-soft); line-height:1.5; }
-
-.otm-rest-item { padding:12px 2px; border-bottom:1px solid var(--border); }
-.otm-rest-item:last-child { border-bottom:none; }
-.otm-rest-name { font-weight:700; font-size:14px; }
-.otm-rest-cuisine { font-size:12px; color:var(--accent); font-weight:600; }
-
-.otm-tabbar { display:flex; gap:6px; margin-bottom:20px; overflow-x:auto; border-bottom:1px solid var(--border); }
-.otm-tabbar button { padding:9px 4px; margin-right:18px; border:none; background:none; font-size:13.5px; font-weight:600; color:var(--ink-faint); cursor:pointer; border-bottom:2.5px solid transparent; white-space:nowrap; }
-.otm-tabbar button.active { color:var(--primary); border-bottom-color:var(--primary); }
-
-.otm-banner { display:flex; align-items:center; gap:9px; background:var(--accent-soft); color:#6b4a12; padding:10px 14px; border-radius:10px; font-size:12.5px; margin-bottom:20px; }
-
-@media (max-width: 860px) {
-  .otm-shell { flex-direction:column; }
-  .otm-sidebar { width:100%; flex-direction:row; align-items:center; overflow-x:auto; padding:12px 14px; gap:14px; }
-  .otm-brand { padding:0; }
-  .otm-nav { flex-direction:row; flex:none; }
-  .otm-sidebar-foot { border-top:none; margin:0; padding:0; display:flex; align-items:center; gap:10px; }
-  .otm-user-chip { margin-bottom:0; }
-  .otm-main { padding:20px 16px 50px; }
-}
-`;
-
 /* ============================== SMALL UI PIECES ============================== */
 
 function StatusStamp({ status }) {
@@ -961,47 +789,49 @@ function Sidebar({ active, setActive, currentUser, tripName, onLogout, pendingAp
   const isAdmin = currentUser.role === "admin";
   const initials = (currentUser.displayName || "?").split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase();
   return (
-    <div className="otm-sidebar">
-      <div className="otm-brand">
-        <TrainFront size={22} />
-        <div>
-          <div className="otm-brand-name">{tripName}</div>
-          <div className="otm-brand-sub">Trip Budget & Planner</div>
+    <>
+      <div className="otm-sidebar">
+        <div className="otm-brand">
+          <TrainFront size={22} className="otm-leaf" />
+          <div>
+            <div className="otm-brand-name" style={{fontWeight: 700, fontSize: 18, color: "var(--primary)"}}>{tripName}</div>
+            <div className="otm-brand-sub" style={{fontSize: 12, color: "var(--ink-soft)"}}>Trip Budget & Planner</div>
+          </div>
+        </div>
+        <div className="otm-sidebar-foot">
+          <div className="otm-user-chip">
+            <div className="otm-avatar" style={{background: "var(--accent-soft)", color: "var(--accent)", padding: 6, borderRadius: "50%", fontSize: 11, fontWeight: 700}}>{initials}</div>
+            <div style={{display:"flex", flexDirection:"column", gap:2, textAlign: "left"}}>
+              <span style={{fontWeight:600, fontSize:13}}>{currentUser.displayName}</span>
+              <span style={{fontSize:11, color:"var(--ink-soft)"}}>{isAdmin ? "Admin" : "Traveller"}</span>
+            </div>
+            <button onClick={onLogout} title="Sign Out" style={{background:"transparent", border:"none", cursor:"pointer", padding:4, marginLeft:10}}><LogOut size={16} color="var(--danger)" /></button>
+          </div>
         </div>
       </div>
-      <div className="otm-nav">
+      <div className="otm-tabbar" style={{overflowX: "auto", justifyContent: "flex-start", gap: 8, paddingLeft: 16, paddingRight: 16}}>
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
           return (
-            <button key={item.key} className={"otm-nav-btn" + (active === item.key ? " active" : "")} onClick={() => setActive(item.key)}>
-              <Icon size={16} /> {item.label}
+            <button key={item.key} className={active === item.key ? "active" : ""} onClick={() => setActive(item.key)} style={{flexShrink: 0, minWidth: 64}}>
+              <Icon size={20} />
+              <span style={{marginTop: 4}}>{item.label}</span>
             </button>
           );
         })}
         {isAdmin && (
-          <button className={"otm-nav-btn" + (active === "approvals" ? " active" : "")} onClick={() => setActive("approvals")}>
-            <ShieldCheck size={16} /> Approvals
+          <button className={active === "approvals" ? "active" : ""} onClick={() => setActive("approvals")} style={{flexShrink: 0, minWidth: 64, position: "relative"}}>
+            <ShieldCheck size={20} />
+            <span style={{marginTop: 4}}>Approvals</span>
             {pendingApprovals > 0 && (
-              <span style={{ background: "var(--danger)", color: "#fff", padding: "2px 6px", borderRadius: 10, fontSize: 11, marginLeft: "auto", fontWeight: 700 }}>
+              <span style={{position:"absolute", top:0, right:5, background:"var(--danger)", color:"white", borderRadius:10, padding:"2px 5px", fontSize:10, fontWeight: 700}}>
                 {pendingApprovals}
               </span>
             )}
           </button>
         )}
       </div>
-      <div className="otm-sidebar-foot">
-        <div className="otm-user-chip">
-          <div className="otm-avatar">{initials}</div>
-          <div>
-            <div className="otm-user-name">{currentUser.displayName}</div>
-            <div className="otm-user-role">{currentUser.role === "admin" ? "Trip organizer" : "Traveller"}</div>
-          </div>
-        </div>
-        <button className="otm-btn otm-btn-ghost otm-btn-sm otm-logout" onClick={onLogout} style={{ color: "#fff", borderColor: "rgba(255,255,255,0.3)" }}>
-          <LogOut size={13} /> Log out
-        </button>
-      </div>
-    </div>
+    </>
   );
 }
 
@@ -2070,10 +1900,6 @@ export default function OotyTripManager() {
 
   return (
     <div className="otm-root">
-      <style>{STYLES}</style>
-      <link rel="preconnect" href="https://fonts.googleapis.com" />
-      <style>{"@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');"}</style>
-
       {(!isFirebaseConfigured()) ? (
         <div className="otm-empty" style={{ margin: 40, color: "var(--danger)" }}>
           <AlertCircle size={40} style={{ marginBottom: 15 }} />
