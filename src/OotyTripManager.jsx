@@ -732,7 +732,6 @@ function ApprovalsTab({ approvals, onApprove, onReject }) {
 }
 
 function PhotosTab({ currentUser, photos, onUpdatePhotos }) {
-function PhotosTab({ currentUser, photos, onUpdatePhotos }) {
   const [uploading, setUploading] = useState(false);
   const [selected, setSelected] = useState({});
   const [currentFolder, setCurrentFolder] = useState(null);
