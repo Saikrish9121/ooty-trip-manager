@@ -1607,35 +1607,6 @@ function ItineraryTab({ planData, onUpdatePlan, isAdmin, currentUser, onRequestP
       {tab === "itinerary" && (
         <div>
           <div className="otm-banner"><Route size={15} /> Route is decided for you: take the Gudalur road both ways (~155–160 km, 4–4.5 hrs). Cross the Bandipur forest only 6 AM–9 PM.</div>
-          
-          <div style={{ width: "100%", height: 180, borderRadius: 12, overflow: "hidden", marginBottom: 24, position: "relative", boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
-            {/* Background Map iframe (Non-interactive) */}
-            <iframe 
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d125218.42398495092!2d76.6190130541785!3d11.41188334460618!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ba8bd84b5f3d78d%3A0x179bdb14c93e3f42!2sOoty%2C%20Tamil%20Nadu!5e0!3m2!1sen!2sin!4v1710400000000!5m2!1sen!2sin" 
-              width="100%" 
-              height="100%" 
-              style={{ border: 0, opacity: 0.7, pointerEvents: "none" }} 
-              allowFullScreen="" 
-              loading="lazy" 
-              referrerPolicy="no-referrer-when-downgrade"
-            ></iframe>
-            
-            {/* Overlay with Link */}
-            <a 
-              href="https://www.google.com/maps/dir/Mysore+Railway+Station/Bandipur+National+Park/Pykara+Lake/Ooty/Coonoor/Mudumalai+National+Park/Chamundeshwari+Temple/Mysore+Railway+Station/"
-              target="_blank" 
-              rel="noopener noreferrer"
-              style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textDecoration: "none", background: "linear-gradient(rgba(247, 246, 241, 0.4), rgba(247, 246, 241, 0.95))" }}
-            >
-              <div style={{ background: "var(--brand)", color: "#fff", padding: "10px 20px", borderRadius: 30, display: "flex", alignItems: "center", gap: 8, fontWeight: 600, fontSize: 14, boxShadow: "0 4px 12px rgba(27, 73, 50, 0.3)", transform: "translateY(-5px)" }}>
-                <MapPin size={16} /> Open Complete Route Map
-              </div>
-              <div style={{ color: "var(--brand)", fontSize: 12, fontWeight: 600, marginTop: 12, display: "flex", alignItems: "center", gap: 6 }}>
-                Mysore <ArrowLeftRight size={10} /> Ooty <ArrowLeftRight size={10} /> Coonoor
-              </div>
-            </a>
-          </div>
-
           {planData.days.map((day) => (
             <div className="otm-day-card" key={day.id}>
               <div className="otm-day-title"><CalendarDays size={14} /> {day.title}</div>
