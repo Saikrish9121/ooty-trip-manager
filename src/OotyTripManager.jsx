@@ -573,7 +573,7 @@ function Card({ label, value, icon, tone }) {
 
 /* ============================== AUTH SCREEN ============================== */
 
-function AuthScreen({ members, onRegister, onLogin, authError, busy }) {
+function AuthScreen({ members, adminLimitReached, onRegister, onLogin, authError, busy }) {
   const [mode, setMode] = useState("login");
   const [loginU, setLoginU] = useState("");
   const [loginP, setLoginP] = useState("");
@@ -670,18 +670,17 @@ function AuthScreen({ members, onRegister, onLogin, authError, busy }) {
                   ))}
                 </select>
               </div>
-              <label className="otm-check-row">
-                <input type="checkbox" checked={isAdmin} onChange={(e) => setIsAdmin(e.target.checked)} />
-                I'm the trip organizer (can edit shared costs & members)
-              </label>
+              {!adminLimitReached && (
+                <label className="otm-check-row">
+                  <input type="checkbox" checked={isAdmin} onChange={(e) => setIsAdmin(e.target.checked)} />
+                  I'm the trip organizer (can edit shared costs & members)
+                </label>
+              )}
               <button className="otm-btn otm-btn-primary" type="button" onClick={submitRegister} disabled={busy}>
                 {busy ? <Loader2 size={15} className="otm-spin" /> : <UserPlus size={15} />} Create account
               </button>
             </div>
           )}
-          <p className="otm-hint">
-            {"Data is saved in this browser only \u2014 it is NOT synced between different phones/computers. Everyone in the group should log in from the same shared device/browser to see the same numbers, or ask the organizer for a version with shared online storage. Passwords are hashed before saving, but this is a lightweight tool for a trusted friend group, not bank-grade security."}
-          </p>
         </div>
       </div>
     </div>
@@ -2048,7 +2047,7 @@ export default function OotyTripManager() {
       ) : loading ? (
         <div className="otm-loading"><Loader2 size={28} className="otm-spin" /> Loading your trip data…</div>
       ) : !currentUser ? (
-        <AuthScreen members={appData.members} onRegister={handleRegister} onLogin={handleLogin} authError={authError} busy={busy} />
+        <AuthScreen members={appData.members} adminLimitReached={users.filter(u => u.role === "admin").length >= 2} onRegister={handleRegister} onLogin={handleLogin} authError={authError} busy={busy} />
       ) : (
         <div className="otm-shell">
           <Sidebar active={activeTab} setActive={setActiveTab} currentUser={currentUser} tripName={appData.tripInfo.name} onLogout={handleLogout} pendingApprovals={approvals.filter(a => a.status === "Pending").length} />
