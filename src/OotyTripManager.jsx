@@ -5,12 +5,13 @@ import {
   LogOut, Loader2, TrendingUp, TrendingDown, CheckCircle2, Circle,
   Pencil, Save, ChevronDown, ChevronUp, ShieldCheck, Luggage, CalendarDays,
   AlertCircle, Sprout, PiggyBank, CloudRain, UtensilsCrossed, Coffee,
-  Clock, Route, Info, Star, Camera, CheckSquare, Download
+  Clock, Route, Info, Star, Camera, CheckSquare, Download, Folder, Eye
 } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   Cell, PieChart, Pie, Legend
 } from "recharts";
+import JSZip from "jszip";
 import { isFirebaseConfigured, subscribeToTripData, saveTripKey, uploadFileToFirebase } from "./firebaseClient";
 
 /* ============================== CONSTANTS ============================== */
@@ -731,8 +732,11 @@ function ApprovalsTab({ approvals, onApprove, onReject }) {
 }
 
 function PhotosTab({ currentUser, photos, onUpdatePhotos }) {
+function PhotosTab({ currentUser, photos, onUpdatePhotos }) {
   const [uploading, setUploading] = useState(false);
   const [selected, setSelected] = useState({});
+  const [currentFolder, setCurrentFolder] = useState(null);
+  const [previewPhoto, setPreviewPhoto] = useState(null);
 
   const handleUpload = async (e) => {
     const files = e.target.files;
@@ -746,7 +750,8 @@ function PhotosTab({ currentUser, photos, onUpdatePhotos }) {
           id: uid("photo"),
           url,
           uploadedBy: currentUser.displayName,
-          timestamp: Date.now()
+          timestamp: Date.now(),
+          size: files[i].size || 0
         });
       } catch (err) {
         console.error("Upload failed", err);
@@ -756,13 +761,15 @@ function PhotosTab({ currentUser, photos, onUpdatePhotos }) {
     setUploading(false);
   };
 
-  const toggleSelect = (id) => {
+  const toggleSelect = (id, e) => {
+    e.stopPropagation();
     setSelected(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
   const selectAll = () => {
     const all = {};
-    photos.forEach(p => all[p.id] = true);
+    const visiblePhotos = currentFolder ? photos.filter(p => p.uploadedBy === currentFolder) : photos;
+    visiblePhotos.forEach(p => all[p.id] = true);
     setSelected(all);
   };
 
@@ -799,10 +806,58 @@ function PhotosTab({ currentUser, photos, onUpdatePhotos }) {
     }
   };
 
+  const downloadFolder = async (folderName) => {
+    const folderPhotos = photos.filter(p => p.uploadedBy === folderName);
+    if (!folderPhotos.length) return;
+    try {
+      const zip = new JSZip();
+      for (const p of folderPhotos) {
+        const resp = await fetch(p.url);
+        const blob = await resp.blob();
+        zip.file(`photo_${p.id}.jpg`, blob);
+      }
+      const content = await zip.generateAsync({ type: "blob" });
+      const url = window.URL.createObjectURL(content);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${folderName}_Photos.zip`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (e) {
+      alert("Failed to download folder: " + e.message);
+    }
+  };
+
+  const formatSize = (bytes) => {
+    if (!bytes) return "Unknown size";
+    const mb = bytes / (1024 * 1024);
+    return mb < 1 ? "< 1 MB" : `${mb.toFixed(1)} MB`;
+  };
+
+  const folders = useMemo(() => {
+    const map = {};
+    photos.forEach(p => {
+      if (!map[p.uploadedBy]) map[p.uploadedBy] = { photos: [], totalSize: 0 };
+      map[p.uploadedBy].photos.push(p);
+      map[p.uploadedBy].totalSize += (p.size || 0);
+    });
+    return Object.keys(map).map(k => ({ name: k, ...map[k] }));
+  }, [photos]);
+
+  const visiblePhotos = currentFolder ? photos.filter(p => p.uploadedBy === currentFolder) : [];
+
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-        <h2 style={{ margin: 0 }}>Photos & Receipts</h2>
+        <div>
+          <h2 style={{ margin: 0 }}>Photos & Receipts</h2>
+          {currentFolder && (
+            <p style={{ margin: "5px 0 0 0", color: "var(--accent)", cursor: "pointer", fontWeight: 600 }} onClick={() => { setCurrentFolder(null); setSelected({}); }}>
+              &larr; Back to Folders
+            </p>
+          )}
+        </div>
         <div>
           <label className="otm-btn otm-btn-primary" style={{ cursor: "pointer", opacity: uploading ? 0.7 : 1 }}>
             {uploading ? <Loader2 className="otm-spin" size={16} /> : <Camera size={16} />}
@@ -812,7 +867,7 @@ function PhotosTab({ currentUser, photos, onUpdatePhotos }) {
         </div>
       </div>
       
-      {photos.length > 0 && (
+      {currentFolder && visiblePhotos.length > 0 && (
         <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
           <button className="otm-btn otm-btn-ghost" onClick={selectAll}><CheckSquare size={16} /> Select All</button>
           <button className="otm-btn otm-btn-ghost" onClick={downloadSelected}><Download size={16} /> Download Selected</button>
@@ -820,18 +875,65 @@ function PhotosTab({ currentUser, photos, onUpdatePhotos }) {
         </div>
       )}
 
-      {photos.length === 0 ? (
-        <div className="otm-empty">No photos uploaded yet.</div>
+      {!currentFolder ? (
+        folders.length === 0 ? (
+          <div className="otm-empty">No photos uploaded yet.</div>
+        ) : (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 15 }}>
+            {folders.map(f => (
+              <div key={f.name} className="otm-panel" style={{ cursor: "pointer", padding: 15, display: "flex", flexDirection: "column", gap: 10 }} onClick={() => setCurrentFolder(f.name)}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, color: "var(--ink)" }}>
+                  <Folder size={32} color="var(--accent)" fill="var(--sage-light)" />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 600 }}>{f.name}'s Uploads</div>
+                    <div style={{ fontSize: 12, color: "var(--ink-soft)" }}>{f.photos.length} items · {formatSize(f.totalSize)}</div>
+                  </div>
+                </div>
+                <button className="otm-btn otm-btn-ghost otm-btn-sm" style={{ width: "100%", justifyContent: "center" }} onClick={(e) => { e.stopPropagation(); downloadFolder(f.name); }}>
+                  <Download size={14} /> Download Folder
+                </button>
+              </div>
+            ))}
+          </div>
+        )
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))", gap: 10 }}>
-          {photos.map(p => (
-            <div key={p.id} style={{ position: "relative", cursor: "pointer", border: selected[p.id] ? "3px solid var(--accent)" : "3px solid transparent", borderRadius: 8 }} onClick={() => toggleSelect(p.id)}>
-              <img src={p.url} alt="Uploaded" style={{ width: "100%", height: 120, objectFit: "cover", borderRadius: 5, display: "block" }} />
-              <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "rgba(0,0,0,0.5)", color: "#fff", fontSize: 10, padding: 4, borderBottomLeftRadius: 5, borderBottomRightRadius: 5 }}>
-                {p.uploadedBy}
+          {visiblePhotos.map(p => (
+            <div key={p.id} style={{ position: "relative", cursor: "pointer", borderRadius: 8, overflow: "hidden", border: selected[p.id] ? "3px solid var(--accent)" : "3px solid transparent" }} onClick={() => setPreviewPhoto(p)}>
+              <img src={p.url} alt="Uploaded" style={{ width: "100%", height: 120, objectFit: "cover", display: "block" }} />
+              <div style={{ position: "absolute", top: 5, left: 5 }}>
+                <input type="checkbox" checked={!!selected[p.id]} onChange={(e) => toggleSelect(p.id, e)} onClick={(e) => e.stopPropagation()} style={{ width: 16, height: 16, cursor: "pointer" }} />
+              </div>
+              <div style={{ position: "absolute", top: 5, right: 5, background: "rgba(0,0,0,0.5)", color: "#fff", borderRadius: 4, padding: 2 }}>
+                <Eye size={14} />
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {previewPhoto && (
+        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(0,0,0,0.9)", zIndex: 9999, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 20 }}>
+          <div style={{ position: "absolute", top: 20, right: 20, display: "flex", gap: 15 }}>
+            <button className="otm-btn otm-btn-primary" onClick={async () => {
+              try {
+                const resp = await fetch(previewPhoto.url);
+                const blob = await resp.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `photo_${previewPhoto.id}.jpg`;
+                a.click();
+              } catch(e) { console.error(e); }
+            }}>
+              <Download size={16} /> Download
+            </button>
+            <button className="otm-btn otm-btn-ghost" style={{ color: "#fff" }} onClick={() => setPreviewPhoto(null)}>
+              <X size={24} />
+            </button>
+          </div>
+          <img src={previewPhoto.url} style={{ maxWidth: "100%", maxHeight: "90vh", objectFit: "contain", borderRadius: 8 }} />
+          <p style={{ color: "#fff", marginTop: 15, fontSize: 14 }}>Uploaded by {previewPhoto.uploadedBy}</p>
         </div>
       )}
     </div>
