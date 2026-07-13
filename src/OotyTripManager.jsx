@@ -995,6 +995,13 @@ function MyExpensesTab({ currentUser, appData, logEntries, onAddExpense, onDelet
   const computed = computeMember(member, appData.commonExpenses, logEntries);
   const myLog = logEntries.filter((e) => e.memberId === member.id).sort((a, b) => (b.date || "").localeCompare(a.date || ""));
 
+  const myPieData = [
+    { name: "Train", value: computed.trainShare },
+    { name: "Resort & shared", value: computed.sharedShare },
+    { name: "Personal spends", value: computed.personal },
+  ].filter((d) => d.value > 0.5);
+  const pieColors = ["#234B36", "#C1892E", "#3E6B4E"];
+
   function submit(e) {
     if (e && e.preventDefault) e.preventDefault();
     if (!desc.trim() || !amount || Number(amount) <= 0) return;
@@ -1104,6 +1111,23 @@ function MyExpensesTab({ currentUser, appData, logEntries, onAddExpense, onDelet
             </tbody>
           </table>
         ) : <div className="otm-empty">No expenses logged yet. Add your first one above.</div>}
+      </div>
+
+      <div className="otm-panel">
+        <div className="otm-panel-head">
+          <h3 className="otm-panel-title"><TrendingUp size={16} /> My Cost Breakdown</h3>
+        </div>
+        {myPieData.length ? (
+          <ResponsiveContainer width="100%" height={260}>
+            <PieChart>
+              <Pie data={myPieData} dataKey="value" nameKey="name" innerRadius={55} outerRadius={95} paddingAngle={2}>
+                {myPieData.map((entry, idx) => (<Cell key={idx} fill={pieColors[idx % pieColors.length]} />))}
+              </Pie>
+              <Legend />
+              <Tooltip formatter={(v) => formatMoney(v, symbol)} />
+            </PieChart>
+          </ResponsiveContainer>
+        ) : <div className="otm-empty">No costs allocated yet.</div>}
       </div>
     </div>
   );
