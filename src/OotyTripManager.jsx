@@ -334,7 +334,7 @@ function computeMember(member, commonExpenses, logEntries) {
   const personal = myLog.filter((e) => e.type === "Personal").reduce((s, e) => s + (Number(e.amount) || 0), 0);
   const totalPaid = (Number(member.advancePaid) || 0) + groupCredit;
   const totalExpenditure = shareOfCommon + personal;
-  const balance = totalExpenditure - totalPaid;
+  const balance = shareOfCommon - totalPaid;
   const status = balance > 0.5 ? "To Pay" : balance < -0.5 ? "To Receive" : "Settled";
   return { ...member, trainShare, sharedShare, shareOfCommon, groupCredit, personal, totalPaid, totalExpenditure, balance, status, logCount: myLog.length };
 }
