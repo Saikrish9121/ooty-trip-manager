@@ -335,7 +335,7 @@ function computeMember(member, commonExpenses, logEntries) {
     .reduce((sum, e) => sum + (Number(e.totalCost) || 0) / (Number(e.splitAmong) || 1), 0);
   const sharedShare = commonExpenses
     .filter((e) => e.type === "shared")
-    .reduce((sum, e) => sum + (Number(e.totalCost) || 0) / (Number(e.splitAmong) || 1), 0);
+    .reduce((sum, e) => sum + (Number(e.totalCost) || 0) / (members.length || 1), 0);
   const shareOfCommon = trainShare + sharedShare;
   const myLog = logEntries.filter((e) => e.memberId === member.id);
   const groupCredit = myLog.filter((e) => e.type === "Group").reduce((s, e) => s + (Number(e.amount) || 0), 0);
@@ -1395,9 +1395,9 @@ function CommonExpensesTab({ appData, currentUser, onUpdateExpense, onAddExpense
         <div className="otm-panel">
           <div className="otm-inline-form" style={{ borderTop: "none", paddingTop: 0, marginTop: 0 }}>
             <div className="otm-field" style={{ flex: 2 }}><label>Category name</label><input className="otm-input" value={newCat} onChange={(e) => setNewCat(e.target.value)} placeholder="e.g. Snacks & water bottles" /></div>
-            <div className="otm-field"><label>Total cost ({symbol})</label><input className="otm-input" type="number" value={newCost} onChange={(e) => setNewCost(e.target.value)} /></div>
-            <div className="otm-field"><label>Split among (#)</label><input className="otm-input" type="number" value={newSplit} onChange={(e) => setNewSplit(e.target.value)} /></div>
-            <button className="otm-btn otm-btn-primary" onClick={() => { if (newCat.trim()) { onAddExpense({ id: uid("ce"), category: newCat.trim(), totalCost: Number(newCost) || 0, advancePaid: 0, splitAmong: Number(newSplit) || 1, type: "shared", legKey: null }); setNewCat(""); setNewCost(""); setShowAdd(false); } }}>Add</button>
+            <div className="otm-field"><label>Total Cost</label><input className="otm-input" type="number" placeholder="0" value={newCost} onChange={(e) => setNewCost(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && newCat.trim()) { onAddExpense({ id: uid("ce"), category: newCat.trim(), totalCost: Number(newCost) || 0, advancePaid: 0, splitAmong: appData.members.length, type: "shared", legKey: null }); setNewCat(""); setNewCost(""); setShowAdd(false); } }} /></div>
+            <div className="otm-field"><label>Split among (#)</label><div style={{ padding: "8px 12px", background: "var(--surface)", borderRadius: 6, fontSize: 13, color: "var(--ink-soft)", border: "1px solid var(--border)" }}>All {appData.members.length} members</div></div>
+            <button className="otm-btn otm-btn-primary" onClick={() => { if (newCat.trim()) { onAddExpense({ id: uid("ce"), category: newCat.trim(), totalCost: Number(newCost) || 0, advancePaid: 0, splitAmong: appData.members.length, type: "shared", legKey: null }); setNewCat(""); setNewCost(""); setShowAdd(false); } }}>Add</button>
           </div>
         </div>
       )}
@@ -1407,7 +1407,8 @@ function CommonExpensesTab({ appData, currentUser, onUpdateExpense, onAddExpense
           <thead><tr><th>Category</th><th>Type</th><th className="otm-num">Total Cost</th><th className="otm-num">Advance Paid</th><th className="otm-num">Split Among</th><th className="otm-num">Cost / Person</th><th></th></tr></thead>
           <tbody>
             {appData.commonExpenses.map((e) => {
-              const perPerson = (Number(e.totalCost) || 0) / (Number(e.splitAmong) || 1);
+              const divisor = e.type === "shared" ? appData.members.length : (Number(e.splitAmong) || 1);
+              const perPerson = (Number(e.totalCost) || 0) / (divisor || 1);
               return (
                 <tr key={e.id}>
                   <td>{e.category}</td>
@@ -1416,8 +1417,10 @@ function CommonExpensesTab({ appData, currentUser, onUpdateExpense, onAddExpense
                     <>
                       <td className="otm-num"><input className="otm-input" style={{ width: 90, textAlign: "right" }} type="number" value={draft.totalCost} onChange={(ev) => setDraft({ ...draft, totalCost: ev.target.value })} /></td>
                       <td className="otm-num"><input className="otm-input" style={{ width: 90, textAlign: "right" }} type="number" value={draft.advancePaid} onChange={(ev) => setDraft({ ...draft, advancePaid: ev.target.value })} /></td>
-                      <td className="otm-num"><input className="otm-input" style={{ width: 70, textAlign: "right" }} type="number" value={draft.splitAmong} onChange={(ev) => setDraft({ ...draft, splitAmong: ev.target.value })} /></td>
-                      <td className="otm-num">{formatMoney((Number(draft.totalCost) || 0) / (Number(draft.splitAmong) || 1), symbol)}</td>
+                      <td className="otm-num">
+                        {e.type === "shared" ? <span style={{color:"var(--muted)", fontSize:12}}>All ({appData.members.length})</span> : <input className="otm-input" style={{ width: 70, textAlign: "right" }} type="number" value={draft.splitAmong} onChange={(ev) => setDraft({ ...draft, splitAmong: ev.target.value })} />}
+                      </td>
+                      <td className="otm-num">{formatMoney((Number(draft.totalCost) || 0) / (e.type === "shared" ? appData.members.length : (Number(draft.splitAmong) || 1)), symbol)}</td>
                       <td>
                         <div style={{ display: "flex", gap: 6 }}>
                           <button className="otm-btn otm-btn-primary otm-btn-sm" onClick={() => saveEdit(e.id)}><Save size={12} /></button>
@@ -1429,7 +1432,7 @@ function CommonExpensesTab({ appData, currentUser, onUpdateExpense, onAddExpense
                     <>
                       <td className="otm-num">{formatMoney(e.totalCost, symbol)}</td>
                       <td className="otm-num">{formatMoney(e.advancePaid, symbol)}</td>
-                      <td className="otm-num">{e.splitAmong}</td>
+                      <td className="otm-num">{e.type === "shared" ? `All (${appData.members.length})` : e.splitAmong}</td>
                       <td className="otm-num" style={{ fontWeight: 600 }}>{formatMoney(perPerson, symbol)}</td>
                       <td>{isAdmin && (
                         <div style={{ display: "flex", gap: 6 }}>
