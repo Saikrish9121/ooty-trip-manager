@@ -1,0 +1,81 @@
+{
+  "places": [
+    {
+      "id": "botanical_garden",
+      "label": "Botanical Garden, Ooty",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/c/c1/Botanical_Gardens_-_Ootacamund_%28Ooty%29_-_India_03.JPG"
+    },
+    {
+      "id": "ooty_lake",
+      "label": "Ooty Lake",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/c/c8/Ooty_Lake_in_Tamil_Nadu_04.jpg"
+    },
+    {
+      "id": "doddabetta",
+      "label": "Doddabetta Peak",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/7/7c/Arts_College_Hill_Ooty_Nilgiris_Mar21_A7C_00188.jpg"
+    },
+    {
+      "id": "sims_park",
+      "label": "Sim's Park, Coonoor",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/f/fc/Rose_bud_%286027707280%29.jpg"
+    },
+    {
+      "id": "dolphins_nose",
+      "label": "Dolphin's Nose, Coonoor",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/a/ae/View_from_the_Dolphin_Peak_in_Ooty%2CTamil_Nadu.JPG"
+    },
+    {
+      "id": "catherine_falls",
+      "label": "Catherine Falls, Kotagiri",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/1/10/St_Catherine_Falls.jpg"
+    },
+    {
+      "id": "kodanad",
+      "label": "Kodanad View Point",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/5/56/Kodanad%2C_Nilgiris.jpg"
+    },
+    {
+      "id": "kotagiri",
+      "label": "Kotagiri Tea Estates",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/b/b0/Kotagiri_Town.jpg"
+    },
+    {
+      "id": "mudumalai",
+      "label": "Mudumalai Safari",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/e/ee/Tiger_Drinking_Pond_Mudumalai_Mar21_DSC01310.jpg"
+    },
+    {
+      "id": "moyar",
+      "label": "Moyar River, Masinagudi",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/f/ff/Moyar_River_Theppakadu_Mar21_A7C_00304.jpg"
+    }
+  ],
+  "foods": [
+    {
+      "id": "ooty_chocolates",
+      "label": "Ooty Chocolates",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/a/a3/Children_aged_5_17_engaged_in_labor%2C_World%2C_2023_%28cropped%29.svg"
+    },
+    {
+      "id": "mysore_pak",
+      "label": "Mysore Pak",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/f/ff/Mysore_pak.jpg"
+    },
+    {
+      "id": "set_dosa",
+      "label": "Set Dosa",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/9/9f/Dosa_at_Sri_Ganesha_Restauran%2C_Bangkok_%2844570742744%29.jpg"
+    },
+    {
+      "id": "meals",
+      "label": "South Indian Meals",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/4/49/Vegetarian_Curry.jpeg"
+    },
+    {
+      "id": "filter_coffee",
+      "label": "Filter Coffee",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/5/51/Filter_kaapi.JPG"
+    }
+  ]
+}

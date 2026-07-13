@@ -16,6 +16,10 @@ import { isFirebaseConfigured, subscribeToTripData, saveTripKey, uploadFileToFir
 import heroImage from "./assets/ooty_hero_landscape.jpg";
 import toyTrainImage from "./assets/ooty_toy_train.jpg";
 import southIndianMealsImage from "./assets/south_indian_meals.jpg";
+import galleryUrls from "./assets/gallery_urls.json";
+
+// Filter out the incorrect chocolate image
+galleryUrls.foods = galleryUrls.foods.filter(f => f.id !== "ooty_chocolates");
 
 /* ============================== CONSTANTS ============================== */
 
@@ -1592,6 +1596,7 @@ function ItineraryTab({ planData, onUpdatePlan, isAdmin, currentUser, onRequestP
 
       <div className="otm-tabbar">
         <button className={tab === "itinerary" ? "active" : ""} onClick={() => setTab("itinerary")}><CalendarDays size={13} style={{ marginRight: 6, verticalAlign: -2 }} />Day plan</button>
+        <button className={tab === "gallery" ? "active" : ""} onClick={() => setTab("gallery")}><Camera size={13} style={{ marginRight: 6, verticalAlign: -2 }} />Gallery</button>
         <button className={tab === "weather" ? "active" : ""} onClick={() => setTab("weather")}><CloudRain size={13} style={{ marginRight: 6, verticalAlign: -2 }} />Weather</button>
         <button className={tab === "packing" ? "active" : ""} onClick={() => setTab("packing")}><Luggage size={13} style={{ marginRight: 6, verticalAlign: -2 }} />Packing</button>
         <button className={tab === "food" ? "active" : ""} onClick={() => setTab("food")}><UtensilsCrossed size={13} style={{ marginRight: 6, verticalAlign: -2 }} />Food to try</button>
@@ -1637,6 +1642,34 @@ function ItineraryTab({ planData, onUpdatePlan, isAdmin, currentUser, onRequestP
               )}
             </div>
           ))}
+        </div>
+      )}
+
+      {tab === "gallery" && (
+        <div style={{ paddingBottom: 20 }}>
+          <div className="otm-panel" style={{ marginBottom: 20 }}>
+            <div className="otm-panel-head"><h3 className="otm-panel-title"><Camera size={16} /> Destinations & Spots</h3></div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 12, marginTop: 10 }}>
+              {galleryUrls.places.map(p => (
+                <div key={p.id} style={{ borderRadius: 8, overflow: "hidden", position: "relative", height: 140, boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>
+                  <img src={p.url} alt={p.label} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                  <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(transparent, rgba(0,0,0,0.8))", color: "#fff", padding: "20px 8px 8px", fontSize: 11, fontWeight: 600, textShadow: "0 1px 3px rgba(0,0,0,0.8)" }}>{p.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          <div className="otm-panel">
+            <div className="otm-panel-head"><h3 className="otm-panel-title"><UtensilsCrossed size={16} /> Regional Food</h3></div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 12, marginTop: 10 }}>
+              {galleryUrls.foods.map(f => (
+                <div key={f.id} style={{ borderRadius: 8, overflow: "hidden", position: "relative", height: 140, boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>
+                  <img src={f.url} alt={f.label} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                  <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(transparent, rgba(0,0,0,0.8))", color: "#fff", padding: "20px 8px 8px", fontSize: 11, fontWeight: 600, textShadow: "0 1px 3px rgba(0,0,0,0.8)" }}>{f.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       )}
 
