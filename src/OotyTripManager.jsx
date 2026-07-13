@@ -333,7 +333,7 @@ function computeMember(member, commonExpenses, logEntries) {
   const groupCredit = myLog.filter((e) => e.type === "Group").reduce((s, e) => s + (Number(e.amount) || 0), 0);
   const personal = myLog.filter((e) => e.type === "Personal").reduce((s, e) => s + (Number(e.amount) || 0), 0);
   const totalPaid = (Number(member.advancePaid) || 0) + groupCredit;
-  const totalExpenditure = shareOfCommon + personal;
+  const totalExpenditure = shareOfCommon;
   const balance = shareOfCommon - totalPaid;
   const status = balance > 0.5 ? "To Pay" : balance < -0.5 ? "To Receive" : "Settled";
   return { ...member, trainShare, sharedShare, shareOfCommon, groupCredit, personal, totalPaid, totalExpenditure, balance, status, logCount: myLog.length };
@@ -917,7 +917,6 @@ function DashboardTab({ appData, computedMembers, logEntries }) {
   const pieData = [
     { name: "Train", value: computedMembers.reduce((s, m) => s + m.trainShare, 0) },
     { name: "Resort & shared", value: computedMembers.reduce((s, m) => s + m.sharedShare, 0) },
-    { name: "Personal spends", value: totalPersonal },
   ].filter((d) => d.value > 0.5);
   const pieColors = ["#234B36", "#C1892E", "#3E6B4E"];
 
@@ -936,7 +935,6 @@ function DashboardTab({ appData, computedMembers, logEntries }) {
       <div className="otm-cards">
         <Card label="Total Collected" value={formatMoney(totalCollected, symbol)} icon={PiggyBank} />
         <Card label="Common Expenses" value={formatMoney(totalCommon, symbol)} icon={Receipt} />
-        <Card label="Personal Spends" value={formatMoney(totalPersonal, symbol)} icon={Wallet} />
         <Card label="Total Expenditure" value={formatMoney(totalExpenditure, symbol)} icon={TrendingUp} />
         <Card label="Still To Collect" value={formatMoney(outstanding, symbol)} icon={AlertCircle} tone={outstanding > 0 ? "neg" : "pos"} />
       </div>
@@ -1160,7 +1158,7 @@ function MembersTab({ appData, computedMembers, logEntries, currentUser, onUpdat
             <tr>
               <th>Name</th><th className="otm-num">Advance</th><th className="otm-num">Group Credit</th>
               <th className="otm-num">Total Paid</th><th className="otm-num">Common Share</th>
-              <th className="otm-num">Personal</th><th className="otm-num">Total Spend</th>
+              <th className="otm-num">Total Spend</th>
               <th className="otm-num">Balance</th><th>Status</th><th></th>
             </tr>
           </thead>
@@ -1173,7 +1171,6 @@ function MembersTab({ appData, computedMembers, logEntries, currentUser, onUpdat
                   <td className="otm-num">{formatMoney(m.groupCredit, symbol)}</td>
                   <td className="otm-num">{formatMoney(m.totalPaid, symbol)}</td>
                   <td className="otm-num">{formatMoney(m.shareOfCommon, symbol)}</td>
-                  <td className="otm-num">{formatMoney(m.personal, symbol)}</td>
                   <td className="otm-num">{formatMoney(m.totalExpenditure, symbol)}</td>
                   <td className="otm-num" style={{ fontWeight: 700, color: m.balance > 0.5 ? "var(--danger)" : m.balance < -0.5 ? "var(--success)" : "inherit" }}>{formatMoney(Math.abs(m.balance), symbol)}</td>
                   <td><StatusStamp status={m.status} /></td>
