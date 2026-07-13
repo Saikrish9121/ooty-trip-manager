@@ -14,6 +14,8 @@ import {
 import JSZip from "jszip";
 import { isFirebaseConfigured, subscribeToTripData, saveTripKey, uploadFileToFirebase } from "./firebaseClient";
 import heroImage from "./assets/ooty_hero_landscape.jpg";
+import toyTrainImage from "./assets/ooty_toy_train.jpg";
+import southIndianMealsImage from "./assets/south_indian_meals.jpg";
 
 /* ============================== CONSTANTS ============================== */
 
@@ -1607,7 +1609,7 @@ function ItineraryTab({ planData, onUpdatePlan, isAdmin, currentUser, onRequestP
               {day.subtitle && <div style={{ fontSize: 12.5, color: "var(--ink-soft)", margin: "-4px 0 12px", paddingLeft: 22 }}>{day.subtitle}</div>}
               {day.title.includes("Day 3") && (
                 <div style={{ width: "100%", height: 140, borderRadius: 10, overflow: "hidden", marginBottom: 15, marginTop: 5, boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}>
-                  <img src="/src/assets/ooty_toy_train.jpg" alt="Nilgiri Mountain Railway" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                  <img src={toyTrainImage} alt="Nilgiri Mountain Railway" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                 </div>
               )}
               {day.activities.map((a) => (
@@ -1758,7 +1760,7 @@ function ItineraryTab({ planData, onUpdatePlan, isAdmin, currentUser, onRequestP
       {tab === "food" && (
         <div>
           <div style={{ width: "100%", height: 160, borderRadius: 12, overflow: "hidden", marginBottom: 20, boxShadow: "0 4px 12px rgba(0,0,0,0.15)" }}>
-            <img src="/src/assets/south_indian_meals.jpg" alt="South Indian Meals" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+            <img src={southIndianMealsImage} alt="South Indian Meals" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
           </div>
           {["Mysore", "En Route", "Pykara", "Ooty", "Coonoor"].map((zone) => {
             const items = food.filter((f) => (f.zone || "Ooty") === zone);
