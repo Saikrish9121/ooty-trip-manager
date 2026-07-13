@@ -329,13 +329,13 @@ function formatMoney(n, symbol) {
   return (symbol || "\u20B9") + rounded.toLocaleString("en-IN");
 }
 
-function computeMember(member, commonExpenses, logEntries) {
+function computeMember(member, commonExpenses, logEntries, memberCount) {
   const trainShare = commonExpenses
     .filter((e) => e.type === "train" && member.legs && member.legs[e.legKey])
     .reduce((sum, e) => sum + (Number(e.totalCost) || 0) / (Number(e.splitAmong) || 1), 0);
   const sharedShare = commonExpenses
     .filter((e) => e.type === "shared")
-    .reduce((sum, e) => sum + (Number(e.totalCost) || 0) / (members.length || 1), 0);
+    .reduce((sum, e) => sum + (Number(e.totalCost) || 0) / (memberCount || 1), 0);
   const shareOfCommon = trainShare + sharedShare;
   const myLog = logEntries.filter((e) => e.memberId === member.id);
   const groupCredit = myLog.filter((e) => e.type === "Group").reduce((s, e) => s + (Number(e.amount) || 0), 0);
@@ -1099,7 +1099,7 @@ function MyExpensesTab({ currentUser, appData, logEntries, onAddExpense, onDelet
     return <div className="otm-empty">Your account isn't linked to a traveller profile yet.</div>;
   }
 
-  const computed = computeMember(member, appData.commonExpenses, logEntries);
+  const computed = computeMember(member, appData.commonExpenses, logEntries, appData.members.length);
   const myLog = logEntries.filter((e) => e.memberId === member.id).sort((a, b) => (b.date || "").localeCompare(a.date || ""));
 
   const myPieData = [
@@ -1956,7 +1956,7 @@ export default function OotyTripManager() {
 
   const computedMembers = useMemo(() => {
     if (!appData) return [];
-    return appData.members.map((m) => computeMember(m, appData.commonExpenses, logEntries));
+    return appData.members.map((m) => computeMember(m, appData.commonExpenses, logEntries, appData.members.length));
   }, [appData, logEntries]);
 
   async function handleRegister({ displayName, username, password, linkChoice, isAdmin }) {
