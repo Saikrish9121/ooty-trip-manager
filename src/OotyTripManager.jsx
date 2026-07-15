@@ -419,12 +419,6 @@ function AuthScreen({ members, adminLimitReached, onRegister, onLogin, authError
 
   const unclaimed = members.filter((m) => !m.claimed);
 
-  useEffect(() => {
-    if (unclaimed.length > 0 && !linkChoice) {
-      setLinkChoice(unclaimed[0].id);
-    }
-  }, [unclaimed, linkChoice]);
-
   function submitLogin(e) {
     if (e && e.preventDefault) e.preventDefault();
     setLocalErr("");
@@ -503,6 +497,7 @@ function AuthScreen({ members, adminLimitReached, onRegister, onLogin, authError
                 <label>Select your profile from the group list</label>
                 {unclaimed.length > 0 ? (
                   <select className="otm-select" value={linkChoice} onChange={(e) => setLinkChoice(e.target.value)}>
+                    <option value="">-- Choose your profile name --</option>
                     {unclaimed.map((m) => (
                       <option key={m.id} value={m.id}>{m.name}</option>
                     ))}
@@ -519,7 +514,7 @@ function AuthScreen({ members, adminLimitReached, onRegister, onLogin, authError
                   I'm the trip organizer (can edit shared costs & members)
                 </label>
               )}
-              <button className="otm-btn otm-btn-primary" type="button" onClick={submitRegister} disabled={busy || unclaimed.length === 0}>
+              <button className="otm-btn otm-btn-primary" type="button" onClick={submitRegister} disabled={busy || unclaimed.length === 0 || !linkChoice}>
                 {busy ? <Loader2 size={15} className="otm-spin" /> : <UserPlus size={15} />} Create account
               </button>
             </div>
