@@ -413,11 +413,17 @@ function AuthScreen({ members, adminLimitReached, onRegister, onLogin, authError
   const [regUser, setRegUser] = useState("");
   const [regPass, setRegPass] = useState("");
   const [regPass2, setRegPass2] = useState("");
-  const [linkChoice, setLinkChoice] = useState("__new__");
+  const [linkChoice, setLinkChoice] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
   const [localErr, setLocalErr] = useState("");
 
   const unclaimed = members.filter((m) => !m.claimed);
+
+  useEffect(() => {
+    if (unclaimed.length > 0 && !linkChoice) {
+      setLinkChoice(unclaimed[0].id);
+    }
+  }, [unclaimed, linkChoice]);
 
   function submitLogin(e) {
     if (e && e.preventDefault) e.preventDefault();
@@ -493,14 +499,19 @@ function AuthScreen({ members, adminLimitReached, onRegister, onLogin, authError
                 <label>Confirm password</label>
                 <input className="otm-input" type="password" value={regPass2} onChange={(e) => setRegPass2(e.target.value)} placeholder="Re-enter password" />
               </div>
-              <div className="otm-field">
-                <label>Link to a name already on the budget sheet</label>
-                <select className="otm-select" value={linkChoice} onChange={(e) => setLinkChoice(e.target.value)}>
-                  <option value="__new__">{"I'm not listed \u2014 add me as a new traveller"}</option>
-                  {unclaimed.map((m) => (
-                    <option key={m.id} value={m.id}>{m.name}</option>
-                  ))}
-                </select>
+               <div className="otm-field">
+                <label>Select your profile from the group list</label>
+                {unclaimed.length > 0 ? (
+                  <select className="otm-select" value={linkChoice} onChange={(e) => setLinkChoice(e.target.value)}>
+                    {unclaimed.map((m) => (
+                      <option key={m.id} value={m.id}>{m.name}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <div style={{ color: "var(--danger)", fontSize: 13, marginTop: 4 }}>
+                    No unclaimed profiles left! Ask the trip organizer to add you first in the Members tab.
+                  </div>
+                )}
               </div>
               {!adminLimitReached && (
                 <label className="otm-check-row">
@@ -508,7 +519,7 @@ function AuthScreen({ members, adminLimitReached, onRegister, onLogin, authError
                   I'm the trip organizer (can edit shared costs & members)
                 </label>
               )}
-              <button className="otm-btn otm-btn-primary" type="button" onClick={submitRegister} disabled={busy}>
+              <button className="otm-btn otm-btn-primary" type="button" onClick={submitRegister} disabled={busy || unclaimed.length === 0}>
                 {busy ? <Loader2 size={15} className="otm-spin" /> : <UserPlus size={15} />} Create account
               </button>
             </div>
