@@ -2059,6 +2059,12 @@ export default function OotyTripManager() {
     persistApp({ ...appData, members: [...appData.members, { id: uid("mem"), name, advancePaid: 0, claimed: false, username: null, legs: { hydMysore: false, blrMysore: false, mysoreBlr: false, mysoreHyd: false } }] });
   }
   function deleteMember(id) {
+    const memberToDelete = appData.members.find((m) => m.id === id);
+    if (memberToDelete && memberToDelete.username) {
+      const nextUsers = users.filter((u) => u.username !== memberToDelete.username);
+      setUsers(nextUsers);
+      saveKey(KEYS.USERS, nextUsers);
+    }
     persistApp({ ...appData, members: appData.members.filter((m) => m.id !== id) });
     persistLog(logEntries.filter((e) => e.memberId !== id));
   }
